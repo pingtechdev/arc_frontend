@@ -1,8 +1,12 @@
 import { ArrowRight, Play, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLocale } from '@/contexts/LocaleContext';
+import AnimatedSection from './AnimatedSection';
 import heroImage from '@/assets/hero-robotics.jpg';
 
 const HeroSection = () => {
+  const { t } = useLocale();
+  
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -26,60 +30,65 @@ const HeroSection = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="space-y-8">
           {/* Badge */}
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-card/50 border border-secondary/20 backdrop-blur-sm">
-            <Zap className="h-4 w-4 text-secondary mr-2" />
-            <span className="text-sm font-medium text-secondary">Advanced Robotics Competition</span>
-          </div>
+          <AnimatedSection delay={0.1}>
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-card/50 border border-secondary/20 backdrop-blur-sm">
+              <Zap className="h-4 w-4 text-secondary mr-2" />
+              <span className="text-sm font-medium text-secondary">Advanced Robotics Competition</span>
+            </div>
+          </AnimatedSection>
 
           {/* Main Heading */}
-          <div className="space-y-4">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight">
-              <span className="text-gradient">ARC</span>
-              <br />
-              <span className="text-foreground">ROBOTICS</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Join the ultimate robotics competition where innovation meets engineering excellence. 
-              Compete, learn, and shape the future of technology.
-            </p>
-          </div>
+          <AnimatedSection delay={0.3}>
+            <div className="space-y-4">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight">
+                <span className="text-gradient">{t('heroTitle')}</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                {t('heroDescription')}
+              </p>
+            </div>
+          </AnimatedSection>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button 
-              onClick={() => scrollToSection('events')}
-              className="btn-hero group"
-            >
-              Explore Events
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            
-            <Button 
-              variant="outline" 
-              size="lg"
-              onClick={() => scrollToSection('volunteers')}
-              className="border-muted text-foreground hover:bg-muted"
-            >
-              <Play className="mr-2 h-5 w-5" />
-              Become a Volunteer
-            </Button>
-          </div>
+          <AnimatedSection delay={0.5} direction="up">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button 
+                onClick={() => scrollToSection('events')}
+                className="btn-hero group"
+              >
+                {t('registerNow')}
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+              
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={() => scrollToSection('volunteers')}
+                className="border-muted text-foreground hover:bg-muted"
+              >
+                <Play className="mr-2 h-5 w-5" />
+                {t('becomeVolunteer')}
+              </Button>
+            </div>
+          </AnimatedSection>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-12">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-secondary">500+</div>
-              <div className="text-sm text-muted-foreground">Participants</div>
+          <AnimatedSection delay={0.7} direction="up">
+            <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-12">
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-secondary">500+</div>
+                <div className="text-sm text-muted-foreground">Participants</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-secondary">50+</div>
+                <div className="text-sm text-muted-foreground">Teams</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-secondary">3</div>
+                <div className="text-sm text-muted-foreground">Competition Days</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-secondary">50+</div>
-              <div className="text-sm text-muted-foreground">Teams</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-secondary">3</div>
-              <div className="text-sm text-muted-foreground">Competition Days</div>
-            </div>
-          </div>
+          </AnimatedSection>
         </div>
       </div>
 

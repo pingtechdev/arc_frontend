@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLocale } from '@/contexts/LocaleContext';
+import ThemeToggle from './ThemeToggle';
+import LocaleToggle from './LocaleToggle';
 import arcLogo from '@/assets/arc-logo.png';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { t, isRTL } = useLocale();
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -15,13 +19,13 @@ const Navigation = () => {
   };
 
   const navItems = [
-    { label: 'Home', action: () => scrollToSection('home') },
-    { label: 'Who we are', action: () => scrollToSection('about') },
-    { label: 'Events', action: () => scrollToSection('events') },
-    { label: 'Become a Volunteer', action: () => scrollToSection('volunteers') },
-    { label: 'Gallery', action: () => scrollToSection('gallery') },
-    { label: 'Categories & Rules', action: () => scrollToSection('rules') },
-    { label: 'About ARC', action: () => scrollToSection('about-arc') },
+    { label: t('home'), action: () => scrollToSection('home') },
+    { label: t('whoWeAre'), action: () => scrollToSection('about') },
+    { label: t('events'), action: () => scrollToSection('events') },
+    { label: t('becomeVolunteer'), action: () => scrollToSection('volunteers') },
+    { label: t('gallery'), action: () => scrollToSection('gallery') },
+    { label: t('categoriesRules'), action: () => scrollToSection('rules') },
+    { label: t('aboutARC'), action: () => scrollToSection('about-arc') },
   ];
 
   return (
@@ -39,7 +43,7 @@ const Navigation = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-8">
+          <div className={`hidden lg:flex items-center ${isRTL ? 'space-x-reverse space-x-8' : 'space-x-8'}`}>
             {navItems.map((item) => (
               <button
                 key={item.label}
@@ -49,9 +53,13 @@ const Navigation = () => {
                 {item.label}
               </button>
             ))}
-            <Button variant="outline" size="sm" className="border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground">
-              Login/Register
-            </Button>
+            <div className="flex items-center space-x-2">
+              <ThemeToggle />
+              <LocaleToggle />
+              <Button variant="outline" size="sm" className="border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground">
+                {t('loginRegister')}
+              </Button>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -79,9 +87,13 @@ const Navigation = () => {
                   {item.label}
                 </button>
               ))}
-              <div className="px-3 py-2">
+              <div className="px-3 py-2 space-y-2">
+                <div className="flex justify-center space-x-2">
+                  <ThemeToggle />
+                  <LocaleToggle />
+                </div>
                 <Button variant="outline" size="sm" className="w-full border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground">
-                  Login/Register
+                  {t('loginRegister')}
                 </Button>
               </div>
             </div>
