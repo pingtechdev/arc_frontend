@@ -6,44 +6,44 @@
 
 @layer base {
   :root {
-    /* Main Brand Colors */
-    --background: 220 26% 6%;
-    --foreground: 210 40% 98%;
+    /* Light Theme - Main Brand Colors */
+    --background: 0 0% 100%;
+    --foreground: 220 26% 6%;
 
-    --card: 220 20% 8%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 98%;
+    --card-foreground: 220 26% 6%;
 
-    --popover: 220 20% 8%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 98%;
+    --popover-foreground: 220 26% 6%;
 
-    /* Tech Blue Primary */
-    --primary: 210 100% 12%;
-    --primary-foreground: 210 40% 98%;
+    /* ARC Red Primary */
+    --primary: 0 84% 50%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Electric Cyan Secondary */
-    --secondary: 190 100% 42%;
-    --secondary-foreground: 220 26% 6%;
+    /* ARC Black Secondary */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 100%;
 
     /* Muted Grays */
-    --muted: 220 15% 15%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 220 15% 95%;
+    --muted-foreground: 215 20% 35%;
 
-    /* Energetic Orange Accent */
-    --accent: 25 100% 58%;
-    --accent-foreground: 220 26% 6%;
+    /* ARC Red Accent */
+    --accent: 0 84% 60%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 20%;
-    --input: 220 15% 15%;
-    --ring: 190 100% 42%;
+    --border: 220 15% 85%;
+    --input: 220 15% 95%;
+    --ring: 0 84% 50%;
 
     /* Custom ARC Variables */
-    --gradient-primary: linear-gradient(135deg, hsl(210 100% 12%), hsl(190 100% 42%));
-    --gradient-hero: linear-gradient(135deg, hsl(220 26% 6%), hsl(210 100% 8%));
-    --shadow-glow: 0 0 40px hsl(190 100% 42% / 0.3);
-    --shadow-tech: 0 10px 30px -10px hsl(190 100% 42% / 0.2);
+    --gradient-primary: linear-gradient(135deg, hsl(0 84% 50%), hsl(0 0% 15%));
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%), hsl(220 15% 95%));
+    --shadow-glow: 0 0 40px hsl(0 84% 50% / 0.2);
+    --shadow-tech: 0 10px 30px -10px hsl(0 84% 50% / 0.15);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --radius: 0.5rem;
@@ -76,29 +76,29 @@
     --popover: 220 20% 6%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 100% 15%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 0 84% 55%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 190 100% 45%;
-    --secondary-foreground: 220 26% 4%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 0 0% 100%;
 
     --muted: 220 15% 10%;
     --muted-foreground: 215 20% 70%;
 
-    --accent: 25 100% 62%;
-    --accent-foreground: 220 26% 4%;
+    --accent: 0 84% 65%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 65%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
     --border: 220 15% 15%;
     --input: 220 15% 10%;
-    --ring: 190 100% 45%;
+    --ring: 0 84% 55%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(210 100% 15%), hsl(190 100% 45%));
-    --gradient-hero: linear-gradient(135deg, hsl(220 26% 4%), hsl(210 100% 6%));
-    --shadow-glow: 0 0 40px hsl(190 100% 45% / 0.4);
-    --shadow-tech: 0 10px 30px -10px hsl(190 100% 45% / 0.3);
+    --gradient-primary: linear-gradient(135deg, hsl(0 84% 55%), hsl(0 0% 20%));
+    --gradient-hero: linear-gradient(135deg, hsl(220 26% 4%), hsl(0 0% 8%));
+    --shadow-glow: 0 0 40px hsl(0 84% 55% / 0.4);
+    --shadow-tech: 0 10px 30px -10px hsl(0 84% 55% / 0.3);
   }
 }
 
@@ -108,11 +108,56 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-variation-settings: normal;
   }
 
   html {
     scroll-behavior: smooth;
+  }
+
+  /* Typography Scale */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -0.05em;
+  }
+
+  h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 600;
+  }
+
+  h3 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+  }
+
+  h4 {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    font-weight: 600;
+  }
+
+  /* Code and Monospace */
+  code, pre, kbd, samp {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-feature-settings: 'liga' 1, 'calt' 1;
+  }
+
+  /* Improved text rendering */
+  p, span, div {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -146,5 +191,116 @@
   /* Section Spacing */
   .section-py {
     @apply py-20 lg:py-32;
+  }
+
+  /* Typography Classes */
+  .text-display {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    line-height: 1.1;
+  }
+
+  .text-heading {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+  }
+
+  .text-body {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  .text-body-lg {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    line-height: 1.7;
+    font-size: 1.125rem;
+  }
+
+  .text-caption {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.875rem;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+  }
+
+  .text-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-feature-settings: 'liga' 1, 'calt' 1;
+  }
+
+  /* Floating Animation */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Pulse Glow Animation */
+  @keyframes pulse-glow {
+    0%, 100% { 
+      box-shadow: 0 0 20px hsl(0 84% 50% / 0.3);
+    }
+    50% { 
+      box-shadow: 0 0 40px hsl(0 84% 50% / 0.6);
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Slide In Animation */
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-in-up {
+    animation: slideInUp 0.6s ease-out;
+  }
+
+  /* Rotate Animation */
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .animate-rotate {
+    animation: rotate 2s linear infinite;
+  }
+
+  /* Bounce Animation */
+  @keyframes bounce {
+    0%, 20%, 53%, 80%, 100% {
+      transform: translate3d(0,0,0);
+    }
+    40%, 43% {
+      transform: translate3d(0, -8px, 0);
+    }
+    70% {
+      transform: translate3d(0, -4px, 0);
+    }
+    90% {
+      transform: translate3d(0, -2px, 0);
+    }
+  }
+
+  .animate-bounce-custom {
+    animation: bounce 2s infinite;
   }
 }

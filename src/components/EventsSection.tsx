@@ -9,33 +9,33 @@ const EventsSection = () => {
   
   const events = [
     {
-      title: "ARC Championship 2024",
-      date: "March 15-17, 2024",
-      time: "9:00 AM - 6:00 PM",
-      location: "American University of Beirut",
-      participants: "50+ Teams",
-      description: "The main championship featuring all competition categories with international participants.",
-      status: "Registration Open",
+      title: t('arcChampionship'),
+      date: t('championshipDate'),
+      time: t('championshipTime'),
+      location: t('aubLocation'),
+      participants: t('championshipParticipants'),
+      description: t('championshipDesc'),
+      status: t('registrationOpen'),
       statusColor: "bg-secondary"
     },
     {
-      title: "Workshop: Robotics Fundamentals",
-      date: "February 10, 2024",
-      time: "10:00 AM - 4:00 PM",
-      location: "LAU Engineering Campus",
-      participants: "100 Students",
-      description: "Hands-on workshop covering robotics basics, programming, and competition preparation.",
-      status: "Coming Soon",
+      title: t('workshopTitle'),
+      date: t('workshopDate'),
+      time: t('workshopTime'),
+      location: t('lauLocation'),
+      participants: t('workshopParticipants'),
+      description: t('workshopDesc'),
+      status: t('comingSoon'),
       statusColor: "bg-accent"
     },
     {
-      title: "Junior Robotics Challenge",
-      date: "April 20, 2024",
-      time: "9:00 AM - 3:00 PM",
-      location: "USJ Technology Center",
-      participants: "30+ Schools",
-      description: "Special competition designed for high school students to encourage early participation.",
-      status: "Registration Opens Soon",
+      title: t('juniorChallenge'),
+      date: t('juniorDate'),
+      time: t('juniorTime'),
+      location: t('usjLocation'),
+      participants: t('juniorParticipants'),
+      description: t('juniorDesc'),
+      status: t('registrationOpensSoon'),
       statusColor: "bg-muted"
     }
   ];
@@ -54,7 +54,7 @@ const EventsSection = () => {
 
         <div className="grid lg:grid-cols-3 gap-8">
           {events.map((event, index) => (
-            <AnimatedSection key={index} delay={index * 0.1} direction="up">
+            <AnimatedSection key={index} delay={index * 0.1} direction="rotate" stagger={true}>
               <Card className="border-border/50 hover:border-secondary/50 transition-all duration-300 hover:glow-tech group h-full">
                 <CardHeader>
                   <div className="flex items-center justify-between mb-4">
@@ -110,13 +110,12 @@ const EventsSection = () => {
         {/* Call to Action */}
         <AnimatedSection delay={0.4} className="text-center mt-16">
           <div className="bg-gradient-primary rounded-2xl p-8 glow-tech">
-            <h3 className="text-2xl font-bold text-white mb-4">Don't Miss Out!</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">{t('dontMissOut')}</h3>
             <p className="text-white/90 mb-6 max-w-2xl mx-auto">
-              Subscribe to our newsletter to get the latest updates on events, registration deadlines, 
-              and exclusive content.
+              {t('newsletterDesc')}
             </p>
             <Button variant="secondary" className="bg-white text-primary hover:bg-white/90">
-              Subscribe Now
+              {t('subscribeNow')}
             </Button>
           </div>
         </AnimatedSection>

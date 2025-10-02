@@ -1,7 +1,10 @@
 import { MapPin, Phone, Mail, Globe, ExternalLink } from 'lucide-react';
-import arcLogo from '@/assets/arc-logo.png';
+import { useLocale } from '@/contexts/LocaleContext';
+import arcLogo from '@/assets/arc/ARC_logo.png';
 
 const Footer = () => {
+  const { t } = useLocale();
+  
   const contactInfo = [
     {
       icon: MapPin,
@@ -49,13 +52,12 @@ const Footer = () => {
               <img 
                 src={arcLogo} 
                 alt="ARC Logo" 
-                className="h-12 w-12 rounded-full glow-tech"
+                className="h-16 w-16 rounded-xl object-contain"
               />
-              <span className="text-2xl font-bold text-gradient">ARC</span>
+              <span className="text-2xl font-bold text-gradient">ARC Lebanon</span>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              Advancing robotics competition in Lebanon and the region, fostering innovation 
-              and technical excellence among students and professionals.
+              {t('aboutDescription')}
             </p>
           </div>
 
@@ -117,10 +119,10 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-sm text-muted-foreground">
-              © 2024 ARC - Advanced Robotics Competition. All rights reserved.
+              {t('copyright')}
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-muted-foreground">Follow us:</span>
+              <span className="text-sm text-muted-foreground">{t('followUs')}:</span>
               <div className="flex space-x-2">
                 {['LinkedIn', 'Twitter', 'Instagram'].map((social, index) => (
                   <button 

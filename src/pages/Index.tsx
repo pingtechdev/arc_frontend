@@ -5,7 +5,7 @@ import EventsSection from '@/components/EventsSection';
 import VolunteerSection from '@/components/VolunteerSection';
 import GallerySection from '@/components/GallerySection';
 import RulesSection from '@/components/RulesSection';
-import AboutARCSection from '@/components/AboutARCSection';
+import OrganizersSection from '@/components/OrganizersSection';
 import Footer from '@/components/Footer';
 
 const Index = () => {
@@ -18,7 +18,7 @@ const Index = () => {
       <VolunteerSection />
       <GallerySection />
       <RulesSection />
-      <AboutARCSection />
+      <OrganizersSection />
       <Footer />
     </div>
   );
