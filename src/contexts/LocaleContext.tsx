@@ -49,7 +49,7 @@ const translations = {
     eventsDescription: 'Join our exciting robotics competitions and workshops',
     
     // Volunteer Section
-    volunteerTitle: 'Join Our Mission',
+    volunteerTitle: 'Become a Volunteer',
     volunteerDescription: 'Be part of something bigger. Help us inspire the next generation of robotics innovators.',
     joinNow: 'Join Now',
     
