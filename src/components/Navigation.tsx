@@ -29,42 +29,27 @@ const Navigation = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
-      {/* Modern Glassmorphism Background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/90 to-background/95 backdrop-blur-xl border-b border-border/20 shadow-2xl shadow-black/5">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-red-500/10 via-transparent to-transparent rounded-full blur-3xl animate-pulse" />
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-red-600/10 via-transparent to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-red-500/5 via-transparent to-red-600/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
-        </div>
+      {/* Solid Container Background */}
+      <div className="bg-card border-b border-border shadow-lg">
         
         {/* Navigation Content */}
         <div className="relative max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
           <div className="flex justify-between items-center h-20 relative">
-            {/* Enhanced Logo with Modern Styling */}
-            <div className="group cursor-pointer z-50 flex-shrink-0 mr-6 mt-5 mb-5">
-              <div className="relative h-20 w-20 flex items-center justify-center">
-                {/* Enhanced Glow Effects */}
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-red-500/30 via-red-600/20 to-red-500/30 blur-md opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110" />
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-red-500/20 to-red-600/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                
-                {/* Logo Container with Glassmorphism */}
-                <div className="relative h-20 w-20 rounded-xl bg-gradient-to-br from-background/80 to-background/60 backdrop-blur-sm border border-red-500/20 shadow-lg group-hover:shadow-red-500/25 transition-all duration-500 flex items-center justify-center overflow-hidden">
-                  <img 
-                    src={arcLogo} 
-                    alt="ARC Logo" 
-                    className="relative h-18 w-18 rounded-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-2 object-contain"
-                    onError={(e) => {
-                      console.error('Logo failed to load:', e);
-                      e.currentTarget.style.display = 'none';
-                      const fallback = e.currentTarget.parentElement?.querySelector('.logo-fallback') as HTMLElement;
-                      if (fallback) fallback.style.display = 'block';
-                    }}
-                    onLoad={() => console.log('Logo loaded successfully')}
-                  />
-                  <div className="logo-fallback hidden h-18 w-18 rounded-lg bg-gradient-to-br from-red-500/20 to-red-600/20 flex items-center justify-center text-red-500 font-bold text-3xl">
-                    A
-                  </div>
+            {/* Logo */}
+            <div className="group cursor-pointer z-50 flex-shrink-0 mr-6">
+              <div className="h-16 w-16 flex items-center justify-center">
+                <img 
+                  src={arcLogo} 
+                  alt="ARC Logo" 
+                  className="h-16 w-16 rounded-xl object-contain transition-all duration-300 group-hover:scale-105"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const fallback = e.currentTarget.parentElement?.querySelector('.logo-fallback') as HTMLElement;
+                    if (fallback) fallback.style.display = 'flex';
+                  }}
+                />
+                <div className="logo-fallback hidden h-16 w-16 rounded-xl bg-muted flex items-center justify-center text-foreground font-bold text-2xl">
+                  A
                 </div>
               </div>
             </div>
@@ -75,7 +60,7 @@ const Navigation = () => {
                 <button
                   key={item.label}
                   onClick={item.action}
-                  className="relative px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-red-500/10 hover:to-red-600/10 group whitespace-nowrap border border-transparent hover:border-red-500/20"
+                  className="relative px-3 py-2 text-sm font-medium text-foreground hover:text-foreground transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-red-500/10 hover:to-red-600/10 group whitespace-nowrap border border-transparent hover:border-red-500/20"
                 >
                   <span className="relative z-10 flex items-center space-x-1">
                     <span>{item.label}</span>
@@ -109,7 +94,7 @@ const Navigation = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="lg:hidden">
+          <div className="lg:hidden flex items-center">
             <Button
               variant="ghost"
               size="sm"
@@ -125,13 +110,13 @@ const Navigation = () => {
         </div>
 
         {/* Enhanced Mobile Navigation */}
-        <div className={`lg:hidden transition-all duration-500 overflow-hidden ${isMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="px-4 pt-6 pb-6 space-y-2 bg-gradient-to-br from-background/95 via-background/90 to-background/95 backdrop-blur-xl border border-red-500/20 rounded-2xl mt-4 shadow-2xl shadow-red-500/10">
+        <div className={`lg:hidden transition-all duration-500 overflow-hidden ${isMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'}`}>
+          <div className="px-4 pt-6 pb-6 space-y-2 bg-muted/50 border-t border-border max-h-[80vh] overflow-y-auto">
             {navItems.map((item, index) => (
               <button
                 key={item.label}
                 onClick={item.action}
-                className="block w-full text-left px-4 py-3 text-base text-foreground/80 hover:text-foreground hover:bg-gradient-to-r hover:from-red-500/10 hover:to-red-600/10 rounded-xl transition-all duration-300 font-medium group whitespace-nowrap border border-transparent hover:border-red-500/20"
+                className="block w-full text-left px-4 py-3 text-base text-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-red-500/10 hover:to-red-600/10 rounded-xl transition-all duration-300 font-medium group whitespace-nowrap border border-transparent hover:border-red-500/20"
                 style={{ animationDelay: `${index * 75}ms` }}
               >
                 <span className="flex items-center space-x-3">
