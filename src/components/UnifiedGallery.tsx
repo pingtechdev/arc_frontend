@@ -36,14 +36,15 @@ interface UnifiedGalleryProps {
   title?: string;
   description?: string;
   className?: string;
+  cmsImages?: any[];
 }
 
-const UnifiedGallery = ({ className = '', title, description }: UnifiedGalleryProps) => {
+const UnifiedGallery = ({ className = '', title, description, cmsImages = [] }: UnifiedGalleryProps) => {
   const { t } = useLocale();
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Combined media array with both videos and images
-  const mediaItems = [
+  // Default media array with both videos and images
+  const defaultMediaItems = [
     // Videos
     { 
       type: 'video',
@@ -116,6 +117,9 @@ const UnifiedGallery = ({ className = '', title, description }: UnifiedGalleryPr
     { type: 'image', src: IMG_9890, title: "Community Engagement", description: "Bringing people together" },
     { type: 'image', src: IMG_9891, title: "Success Stories", description: "Celebrating achievements" }
   ];
+
+  // Use CMS images if available, otherwise use default
+  const mediaItems = cmsImages.length > 0 ? cmsImages : defaultMediaItems;
 
   const nextMedia = () => {
     setActiveIndex((prev) => (prev + 1) % mediaItems.length);

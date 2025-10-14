@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wagtail API Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #dc2626;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 6px;
+            border-left: 4px solid #dc2626;
+        }
+        button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #b91c1c;
+        }
+        pre {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            max-height: 500px;
+        }
+        .success {
+            color: #10b981;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        .info {
+            background: #dbeafe;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Wagtail CMS API Test</h1>
+        
+        <div class="info">
+            <strong>Instructions:</strong> Click the buttons below to test your Wagtail API connection.
+            Make sure your Django server is running on <code>http://localhost:8000</code>
+        </div>
+
+        <!-- Test 1: List Pages -->
+        <div class="test-section">
+            <h2>Test 1: List All Pages</h2>
+            <button onclick="testListPages()">📋 Test List Pages</button>
+            <div id="list-result"></div>
+        </div>
+
+        <!-- Test 2: Get Home Page Detail -->
+        <div class="test-section">
+            <h2>Test 2: Get Home Page Details</h2>
+            <button onclick="testHomePageDetail()">🏠 Test Home Page Detail</button>
+            <div id="detail-result"></div>
+        </div>
+
+        <!-- Test 3: Get Images -->
+        <div class="test-section">
+            <h2>Test 3: Get Images</h2>
+            <button onclick="testImages()">🖼️ Test Images API</button>
+            <div id="images-result"></div>
+        </div>
+
+        <!-- Test 4: Full Integration Test -->
+        <div class="test-section">
+            <h2>Test 4: Full Integration Test</h2>
+            <button onclick="runFullTest()">🚀 Run All Tests</button>
+            <div id="full-test-result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/v2';
+
+        async function testListPages() {
+            const resultDiv = document.getElementById('list-result');
+            resultDiv.innerHTML = '<p>Loading...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/pages/`);
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Success! Found ${data.meta.total_count} page(s)</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testHomePageDetail() {
+            const resultDiv = document.getElementById('detail-result');
+            resultDiv.innerHTML = '<p>Loading...</p>';
+            
+            try {
+                // First get the list to find the home page ID
+                const listResponse = await fetch(`${API_BASE}/pages/?type=arc_cms.HomePage`);
+                const listData = await listResponse.json();
+                
+                if (listData.items.length === 0) {
+                    resultDiv.innerHTML = '<p class="error">❌ No HomePage found. Create one in Wagtail admin!</p>';
+                    return;
+                }
+                
+                const homePageId = listData.items[0].id;
+                
+                // Now get the full details
+                const detailResponse = await fetch(`${API_BASE}/pages/${homePageId}/`);
+                const detailData = await detailResponse.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Success! Home Page Details:</p>
+                    <ul>
+                        <li><strong>Title:</strong> ${detailData.title}</li>
+                        <li><strong>Hero Title:</strong> ${detailData.hero_title || 'Not set'}</li>
+                        <li><strong>Hero Subtitle:</strong> ${detailData.hero_subtitle || 'Not set'}</li>
+                        <li><strong>Body Blocks:</strong> ${detailData.body ? detailData.body.length : 0}</li>
+                    </ul>
+                    <p><strong>Full Response:</strong></p>
+                    <pre>${JSON.stringify(detailData, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testImages() {
+            const resultDiv = document.getElementById('images-result');
+            resultDiv.innerHTML = '<p>Loading...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/images/`);
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Success! Found ${data.meta.total_count} image(s)</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        async function runFullTest() {
+            const resultDiv = document.getElementById('full-test-result');
+            resultDiv.innerHTML = '<p>Running all tests...</p>';
+            
+            let results = [];
+            
+            // Test 1: List Pages
+            try {
+                const response = await fetch(`${API_BASE}/pages/`);
+                await response.json();
+                results.push('✅ List Pages: PASS');
+            } catch (error) {
+                results.push(`❌ List Pages: FAIL (${error.message})`);
+            }
+            
+            // Test 2: Get Home Page
+            try {
+                const listResponse = await fetch(`${API_BASE}/pages/?type=arc_cms.HomePage`);
+                const listData = await listResponse.json();
+                
+                if (listData.items.length > 0) {
+                    const homePageId = listData.items[0].id;
+                    const detailResponse = await fetch(`${API_BASE}/pages/${homePageId}/`);
+                    const detailData = await detailResponse.json();
+                    
+                    if (detailData.hero_title) {
+                        results.push('✅ Home Page Detail with Custom Fields: PASS');
+                    } else {
+                        results.push('⚠️ Home Page Detail: PASS but no custom fields found');
+                    }
+                } else {
+                    results.push('⚠️ Home Page: No HomePage exists');
+                }
+            } catch (error) {
+                results.push(`❌ Home Page Detail: FAIL (${error.message})`);
+            }
+            
+            // Test 3: Images
+            try {
+                const response = await fetch(`${API_BASE}/images/`);
+                await response.json();
+                results.push('✅ Images API: PASS');
+            } catch (error) {
+                results.push(`❌ Images API: FAIL (${error.message})`);
+            }
+            
+            resultDiv.innerHTML = `
+                <h3>Test Results:</h3>
+                <ul>
+                    ${results.map(r => `<li>${r}</li>`).join('')}
+                </ul>
+            `;
+        }
+    </script>
+</body>
+</html>
+

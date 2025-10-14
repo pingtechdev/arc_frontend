@@ -1,11 +1,17 @@
-import { FileText, Download, Shield, Trophy, Settings, Users } from 'lucide-react';
+import { FileText, Eye, Shield, Trophy, Settings, Users, Zap, Cpu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLocale } from '@/contexts/LocaleContext';
 import AnimatedSection from './AnimatedSection';
+import PDFViewer from './PDFViewer';
+import { useState, useEffect } from 'react';
 
 const RulesSection = () => {
   const { t } = useLocale();
+  const [ruleCategories, setRuleCategories] = useState<any[]>([]);
+  const [generalRules, setGeneralRules] = useState<any[]>([]);
+  const [ruleDocuments, setRuleDocuments] = useState<any[]>([]);
+  const [rulesCTA, setRulesCTA] = useState<any>(null);
   
   const categories = [
     {
@@ -34,13 +40,95 @@ const RulesSection = () => {
     }
   ];
 
-  const generalRules = [
+  const defaultGeneralRules = [
     t('registerDeadline'),
     t('safetyInspection'),
     t('multipleCategories'),
     t('fairPlay'),
     t('protestsTime'),
     t('judgesFinal')
+  ];
+
+  const getIcon = (iconName: string) => {
+    const icons: any = {
+      'Trophy': Trophy, 'Users': Users, 'Settings': Settings, 'Shield': Shield,
+      'Cpu': Cpu, 'Zap': Zap
+    };
+    return icons[iconName] || Trophy;
+  };
+
+  useEffect(() => {
+    const fetchRulesContent = async () => {
+      try {
+        const listResponse = await fetch('http://localhost:8000/api/v2/pages/?type=cms_app.HomePage', {
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        });
+        const listData = await listResponse.json();
+        
+        if (listData.items && listData.items.length > 0) {
+          const homePageId = listData.items[0].id;
+          const detailResponse = await fetch(`http://localhost:8000/api/v2/pages/${homePageId}/`, {
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache',
+              'Expires': '0'
+            }
+          });
+          const detailData = await detailResponse.json();
+          
+          console.log('✅ Rules CMS Content loaded');
+          
+          if (detailData.body && Array.isArray(detailData.body)) {
+            // Rule categories
+            const catBlocks = detailData.body.filter((b: any) => b.type === 'rule_categories');
+            if (catBlocks.length > 0 && Array.isArray(catBlocks[0].value)) {
+              const cmsCategories = catBlocks[0].value.map((cat: any) => ({
+                icon: getIcon(cat.icon_name),
+                title: cat.title,
+                description: cat.description,
+                rules: cat.rules || []
+              }));
+              setRuleCategories(cmsCategories);
+            }
+            
+            // General rules
+            const genRulesBlocks = detailData.body.filter((b: any) => b.type === 'general_rules');
+            if (genRulesBlocks.length > 0 && Array.isArray(genRulesBlocks[0].value)) {
+              setGeneralRules(genRulesBlocks[0].value);
+            }
+            
+            // Rule documents
+            const docBlocks = detailData.body.filter((b: any) => b.type === 'rule_documents');
+            if (docBlocks.length > 0 && Array.isArray(docBlocks[0].value)) {
+              setRuleDocuments(docBlocks[0].value);
+            }
+            
+            // FAQ CTA
+            const ctaBlocks = detailData.body.filter((b: any) => b.type === 'rules_faq_cta');
+            if (ctaBlocks.length > 0) {
+              setRulesCTA(ctaBlocks[0].value);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('❌ Failed to load rules content:', error);
+      }
+    };
+    
+    fetchRulesContent();
+  }, []);
+
+  const activeCategories = ruleCategories.length > 0 ? ruleCategories : categories;
+  const activeGeneralRules = generalRules.length > 0 ? generalRules : defaultGeneralRules;
+  const activeDocuments = ruleDocuments.length > 0 ? ruleDocuments : [
+    { name: t('completeRuleBook'), file_size: "2.1 MB", file_type: "PDF" },
+    { name: t('safetyGuidelines'), file_size: "1.5 MB", file_type: "PDF" },
+    { name: t('registrationForm'), file_size: "856 KB", file_type: "PDF" },
+    { name: t('technicalSpecs'), file_size: "3.2 MB", file_type: "PDF" }
   ];
 
   return (
@@ -56,8 +144,8 @@ const RulesSection = () => {
         </AnimatedSection>
 
         {/* Competition Categories */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-16">
-          {categories.map((category, index) => (
+        {/* <div className="grid lg:grid-cols-2 gap-8 mb-16">
+          {activeCategories.map((category, index) => (
             <AnimatedSection key={index} delay={index * 0.1} direction="right" stagger={true}>
               <Card className="border-border/50 hover:border-secondary/50 transition-all duration-300 hover:glow-tech">
               <CardHeader>
@@ -86,7 +174,7 @@ const RulesSection = () => {
               </Card>
             </AnimatedSection>
           ))}
-        </div>
+        </div> */}
 
         {/* General Rules & Downloads */}
         <div className="grid lg:grid-cols-2 gap-12">
@@ -98,7 +186,7 @@ const RulesSection = () => {
                 {t('generalRules')}
               </h3>
               <div className="space-y-3">
-                {generalRules.map((rule, index) => (
+                {activeGeneralRules.map((rule, index) => (
                   <AnimatedSection key={index} delay={index * 0.05} direction="slideLeft" distance={30}>
                     <div className="flex items-start space-x-3">
                       <div className="w-6 h-6 bg-secondary/10 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0">
@@ -120,12 +208,7 @@ const RulesSection = () => {
                 {t('ruleDocuments')}
               </h3>
               <div className="space-y-4">
-                {[
-                  { name: t('completeRuleBook'), size: "2.1 MB", type: "PDF" },
-                  { name: t('safetyGuidelines'), size: "1.5 MB", type: "PDF" },
-                  { name: t('registrationForm'), size: "856 KB", type: "PDF" },
-                  { name: t('technicalSpecs'), size: "3.2 MB", type: "PDF" }
-                ].map((document, index) => (
+                {activeDocuments.map((document, index) => (
                   <AnimatedSection key={index} delay={index * 0.1} direction="slideRight" distance={30}>
                     <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50 hover:border-secondary/50 transition-colors">
                       <div className="flex items-center space-x-3">
@@ -134,12 +217,12 @@ const RulesSection = () => {
                         </div>
                         <div>
                           <div className="font-medium">{document.name}</div>
-                          <div className="text-sm text-muted-foreground">{document.type} • {document.size}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {document.file_type || document.type} • {document.file_size || document.size}
+                          </div>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm">
-                        <Download className="h-4 w-4" />
-                      </Button>
+                      <PDFViewer document={document} />
                     </div>
                   </AnimatedSection>
                 ))}
@@ -149,22 +232,34 @@ const RulesSection = () => {
         </div>
 
         {/* FAQ Section */}
-        <AnimatedSection className="mt-16 text-center" direction="zoom" delay={0.6}>
+        {/* <AnimatedSection className="mt-16 text-center" direction="zoom" delay={0.6}>
           <div className="bg-gradient-primary rounded-2xl p-8 glow-tech">
-            <h3 className="text-2xl font-bold text-white mb-4">{t('haveQuestions')}</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">
+              {rulesCTA?.title || t('haveQuestions')}
+            </h3>
             <p className="text-white/90 mb-6">
-              {t('faqDesc')}
+              {rulesCTA?.description || t('faqDesc')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="secondary" className="bg-white text-primary hover:bg-white/90">
-                {t('viewFAQ')}
+              <Button 
+                variant="secondary" 
+                className="bg-white text-primary hover:bg-white/90"
+                onClick={() => rulesCTA?.primary_button_link ? window.location.href = rulesCTA.primary_button_link : null}
+              >
+                {rulesCTA?.primary_button_text || t('viewFAQ')}
               </Button>
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
-                {t('contactTechnical')}
-              </Button>
+              {rulesCTA?.secondary_button_text && (
+                <Button 
+                  variant="outline" 
+                  className="border-white text-white hover:bg-white hover:text-primary"
+                  onClick={() => rulesCTA?.secondary_button_link ? window.location.href = rulesCTA.secondary_button_link : null}
+                >
+                  {rulesCTA.secondary_button_text}
+                </Button>
+              )}
             </div>
           </div>
-        </AnimatedSection>
+        </AnimatedSection> */}
       </div>
     </section>
   );

@@ -1,13 +1,18 @@
-import { Target, Users, Trophy, Lightbulb } from 'lucide-react';
+import { Target, Users, Trophy, Lightbulb, Heart, Star, Zap, Award } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useLocale } from '@/contexts/LocaleContext';
 import { motion } from 'framer-motion';
 import AnimatedSection from './AnimatedSection';
+import { useState, useEffect } from 'react';
 
 const AboutSection = () => {
   const { t } = useLocale();
+  const [aboutContent, setAboutContent] = useState<{title: string, content: string} | null>(null);
+  const [stats, setStats] = useState<any[]>([]);
+  const [values, setValues] = useState<any[]>([]);
   
-  const values = [
+  // Default values
+  const defaultValues = [
     {
       icon: Target,
       title: t('innovation'),
@@ -29,6 +34,108 @@ const AboutSection = () => {
       description: t('learningDesc')
     }
   ];
+
+  // Map icon names to components
+  const getIcon = (iconName: string) => {
+    const icons: any = {
+      'Target': Target, 'Users': Users, 'Trophy': Trophy, 'Lightbulb': Lightbulb,
+      'Heart': Heart, 'Star': Star, 'Zap': Zap, 'Award': Award
+    };
+    return icons[iconName] || Target;
+  };
+
+  // Fetch about content from CMS
+  useEffect(() => {
+    const fetchAboutContent = async () => {
+      try {
+        // Add cache-busting headers to force fresh data
+        const timestamp = Date.now();
+        const listResponse = await fetch('http://localhost:8000/api/v2/pages/?type=cms_app.HomePage', {
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        });
+        const listData = await listResponse.json();
+        
+        if (listData.items && listData.items.length > 0) {
+          const homePageId = listData.items[0].id;
+          const detailResponse = await fetch(`http://localhost:8000/api/v2/pages/${homePageId}/`, {
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache',
+              'Expires': '0'
+            }
+          });
+          const detailData = await detailResponse.json();
+          
+          if (detailData.body && Array.isArray(detailData.body)) {
+            console.log('🔍 All body blocks:', detailData.body.map((b: any) => b.type));
+            
+            // Extract about blocks (main content)
+            const aboutBlocks = detailData.body.filter((block: any) => block.type === 'about');
+            if (aboutBlocks.length > 0) {
+              const aboutBlock = aboutBlocks[0];
+              const cleanContent = aboutBlock.value?.content?.replace(/<[^>]*>/g, '').trim() || '';
+              const cleanTitle = aboutBlock.value?.title?.replace(/^["']|["']$/g, '').trim() || '';
+              
+              setAboutContent({
+                title: cleanTitle,
+                content: cleanContent
+              });
+            }
+            
+            // Extract stats
+            const statBlocks = detailData.body.filter((block: any) => block.type === 'about_stats');
+            if (statBlocks.length > 0 && Array.isArray(statBlocks[0].value)) {
+              setStats(statBlocks[0].value);
+              console.log('📊 About stats loaded:', statBlocks[0].value);
+            }
+            
+            // Extract value cards
+            const valueCardBlocks = detailData.body.filter((block: any) => block.type === 'value_cards');
+            if (valueCardBlocks.length > 0 && Array.isArray(valueCardBlocks[0].value)) {
+              const cmsValues = valueCardBlocks[0].value.map((v: any) => ({
+                icon: getIcon(v.icon_name),
+                title: v.title,
+                description: v.description
+              }));
+              setValues(cmsValues);
+              console.log('💎 Value cards loaded:', cmsValues);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load about content:', error);
+      }
+    };
+    
+    fetchAboutContent();
+  }, []);
+
+  // Force re-render when content changes
+  useEffect(() => {
+    if (aboutContent) {
+      console.log('✅ About content loaded:', aboutContent);
+    }
+  }, [aboutContent]);
+
+  useEffect(() => {
+    if (stats.length > 0) {
+      console.log('✅ About stats loaded:', stats);
+    }
+  }, [stats]);
+
+  useEffect(() => {
+    if (values.length > 0) {
+      console.log('✅ Value cards loaded:', values);
+    }
+  }, [values]);
+
+  // Debug: Log what we're actually displaying
+  console.log('🔍 Displaying title:', aboutContent?.title || 'Loading...');
+  console.log('🔍 Displaying content:', aboutContent?.content || 'Loading...');
 
   return (
     <section id="about" className="section-py relative overflow-hidden">
@@ -64,65 +171,51 @@ const AboutSection = () => {
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Main About Content from CMS */}
         <AnimatedSection className="text-center mb-16">
           <h2 className="text-heading text-4xl md:text-5xl mb-6">
-            <span className="text-gradient">{t('aboutTitle')}</span>
+            <span className="text-gradient">
+              {aboutContent?.title || 'Loading...'}
+            </span>
           </h2>
           <p className="text-body-lg text-muted-foreground max-w-3xl mx-auto">
-            {t('aboutDescription')}
+            {aboutContent?.content || 'Loading...'}
           </p>
         </AnimatedSection>
 
-        <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
-          <AnimatedSection direction="left">
-            <div className="space-y-6">
-              <h3 className="text-heading text-3xl">{t('ourMission')}</h3>
-              <p className="text-body-lg text-muted-foreground">
-                {t('missionDesc1')}
-              </p>
-              <p className="text-body-lg text-muted-foreground">
-                {t('missionDesc2')}
-              </p>
+        {/* Mission Section - Using CMS content */}
+        <div className="max-w-4xl mx-auto mb-20">
+          <AnimatedSection direction="fade">
+            <div className="space-y-6 text-center">
               
-              <div className="grid grid-cols-2 gap-6 pt-6">
-                <div className="text-center">
-                  <div className="text-display text-3xl text-secondary">5+</div>
-                  <div className="text-caption text-muted-foreground">{t('yearsActive')}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-display text-3xl text-secondary">1000+</div>
-                  <div className="text-caption text-muted-foreground">{t('participants')}</div>
-                </div>
-              </div>
-            </div>
-          </AnimatedSection>
-
-          <AnimatedSection direction="right">
-            <div className="relative">
-              <div className="bg-gradient-primary rounded-2xl p-8 glow-tech">
-                <h4 className="text-2xl font-bold text-white mb-4">{t('competitionCategories')}</h4>
-                <div className="space-y-4">
-                  {[
-                    t('autonomousNav'),
-                    t('robotSoccer'), 
-                    t('lineFollowing'),
-                    t('mazeSolving'),
-                    t('sumoWrestling')
-                  ].map((category, index) => (
-                    <div key={index} className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-white rounded-full" />
-                      <span className="text-white/90">{category}</span>
+              
+              {/* Stats Section */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6">
+                {stats.length > 0 ? stats.map((stat, index) => (
+                  <div key={index} className="text-center">
+                    <div className="text-display text-3xl text-secondary">{stat.number}</div>
+                    <div className="text-caption text-muted-foreground">{stat.label}</div>
+                  </div>
+                )) : (
+                  <>
+                    <div className="text-center">
+                      <div className="text-display text-3xl text-secondary">5+</div>
+                      <div className="text-caption text-muted-foreground">Years Active</div>
                     </div>
-                  ))}
-                </div>
+                    <div className="text-center">
+                      <div className="text-display text-3xl text-secondary">1000+</div>
+                      <div className="text-caption text-muted-foreground">Participants</div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </AnimatedSection>
         </div>
 
-        {/* Values Grid */}
+        {/* Values Grid - From CMS */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {values.map((value, index) => (
+          {(values.length > 0 ? values : defaultValues).map((value, index) => (
             <AnimatedSection key={index} delay={index * 0.1} direction="scale" stagger={true}>
               <Card className="border-border/50 hover:border-secondary/50 transition-all duration-300 hover:glow-tech group h-full">
                 <CardContent className="p-6 text-center">
