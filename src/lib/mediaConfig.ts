@@ -5,7 +5,7 @@
 
 export const MEDIA_CONFIG = {
   // Base URL for media files
-  BASE_URL: import.meta.env.VITE_CMS_API_URL || 'http://localhost:8000',
+  BASE_URL: import.meta.env.VITE_CMS_API_URL || 'https://api.arc.pingtech.dev',
   
   // Media paths
   RULES_PATH: '/media/rules/',
@@ -20,8 +20,8 @@ export const MEDIA_CONFIG = {
   FALLBACK_URLS: [
     '/media/documents/',  // Primary: Wagtail documents
     '/media/rules/',       // Secondary: Rules folder
-    'http://localhost:8000/media/documents/',
-    'http://localhost:8000/media/rules/',
+    'https://api.arc.pingtech.dev/media/documents/',
+    'https://api.arc.pingtech.dev/media/rules/',
     'https://your-cms-domain.com/media/documents/',
     'https://your-cms-domain.com/media/rules/'
   ]

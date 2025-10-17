@@ -3,7 +3,7 @@
  * Provides methods to fetch content from the headless Wagtail CMS
  */
 
-const API_BASE_URL = import.meta.env.VITE_WAGTAIL_API_URL || 'http://localhost:8000/api/v2';
+const API_BASE_URL = import.meta.env.VITE_WAGTAIL_API_URL || 'https://api.arc.pingtech.dev/api/v2';
 
 export interface WagtailPage {
   id: number;

@@ -76,7 +76,7 @@ const Footer = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v2/settings/', {
+        const response = await fetch('https://api.arc.pingtech.dev/api/v2/settings/', {
           headers: {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache',

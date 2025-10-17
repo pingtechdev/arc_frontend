@@ -20,7 +20,7 @@ const GallerySection = () => {
   useEffect(() => {
     const fetchGalleryContent = async () => {
       try {
-        const listResponse = await fetch('http://localhost:8000/api/v2/pages/?type=cms_app.HomePage', {
+        const listResponse = await fetch('https://api.arc.pingtech.dev/api/v2/pages/?type=cms_app.HomePage', {
           headers: {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache',
@@ -31,7 +31,7 @@ const GallerySection = () => {
         
         if (listData.items && listData.items.length > 0) {
           const homePageId = listData.items[0].id;
-          const detailResponse = await fetch(`http://localhost:8000/api/v2/pages/${homePageId}/`, {
+          const detailResponse = await fetch(`https://api.arc.pingtech.dev/api/v2/pages/${homePageId}/`, {
             headers: {
               'Cache-Control': 'no-cache',
               'Pragma': 'no-cache',
