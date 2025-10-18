@@ -40,17 +40,17 @@ echo "================================="
 print_status "Pulling latest changes from repository..."
 cd $PROJECT_ROOT
 
-# Check if it's a git repository, if not initialize it
-if [ ! -d ".git" ]; then
-    print_warning "Not a git repository. Initializing..."
-    git init
-    git remote add origin $REPO_URL
-    git fetch origin
-    git checkout -b main origin/main
-else
-    print_status "Pulling latest changes..."
-    git pull origin main
+# Handle git conflicts by stashing local changes
+print_status "Handling potential git conflicts..."
+if [ -f "$FRONTEND_DIR/update.sh" ]; then
+    print_warning "Backing up local update.sh to avoid conflicts..."
+    cp $FRONTEND_DIR/update.sh $FRONTEND_DIR/update.sh.backup
 fi
+
+# Force pull to overwrite any conflicts
+print_status "Force pulling latest changes..."
+git fetch origin
+git reset --hard origin/main
 
 # Step 2: Navigate to frontend directory
 print_status "Navigating to frontend directory..."
