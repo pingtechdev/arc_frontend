@@ -14,7 +14,7 @@ export default function CMSDebug() {
     console.log('🔍 Fetching from Wagtail API...');
     
     // Step 1: Get the list to find home page ID
-    fetch('https://api.arc.pingtech.dev/api/v2/pages/?type=arc_cms.HomePage')
+    fetch('http://localhost:8000/api/v2/pages/?type=arc_cms.HomePage')
       .then(response => {
         console.log('📋 List response:', response);
         return response.json();
@@ -27,7 +27,7 @@ export default function CMSDebug() {
           console.log('🏠 Home page ID:', homePageId);
           
           // Step 2: Get full details
-          return fetch(`https://api.arc.pingtech.dev/api/v2/pages/${homePageId}/`);
+          return fetch(`http://localhost:8000/api/v2/pages/${homePageId}/`);
         } else {
           throw new Error('No home page found');
         }
