@@ -5,6 +5,7 @@ import { useLocale } from '@/contexts/LocaleContext';
 import AnimatedSection from './AnimatedSection';
 import PDFViewer from './PDFViewer';
 import { useState, useEffect } from 'react';
+import { API_URLS } from '../lib/apiConfig';
 
 const RulesSection = () => {
   const { t } = useLocale();
@@ -60,7 +61,7 @@ const RulesSection = () => {
   useEffect(() => {
     const fetchRulesContent = async () => {
       try {
-        const listResponse = await fetch('http://localhost:8000/api/v2/pages/?type=cms_app.HomePage', {
+        const listResponse = await fetch(`${API_URLS.PAGES}?type=cms_app.HomePage`, {
           headers: {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache',
@@ -71,7 +72,7 @@ const RulesSection = () => {
         
         if (listData.items && listData.items.length > 0) {
           const homePageId = listData.items[0].id;
-          const detailResponse = await fetch(`http://localhost:8000/api/v2/pages/${homePageId}/`, {
+          const detailResponse = await fetch(`${API_URLS.PAGES}${homePageId}/`, {
             headers: {
               'Cache-Control': 'no-cache',
               'Pragma': 'no-cache',

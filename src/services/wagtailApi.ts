@@ -3,7 +3,9 @@
  * Provides methods to fetch content from the headless Wagtail CMS
  */
 
-const API_BASE_URL = import.meta.env.VITE_WAGTAIL_API_URL || 'http://localhost:8000/api/v2';
+import { API_CONFIG, getApiUrl } from '../lib/apiConfig';
+
+const API_BASE_URL = getApiUrl(API_CONFIG.WAGTAIL_API_BASE);
 
 export interface WagtailPage {
   id: number;

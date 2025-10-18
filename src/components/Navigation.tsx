@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useLocale } from '@/contexts/LocaleContext';
 import ThemeToggle from './ThemeToggle';
 import arcLogo from '@/assets/arc/ARC_logo.png';
+import { API_URLS } from '../lib/apiConfig';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,7 +16,7 @@ const Navigation = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v2/settings/', {
+        const response = await fetch(API_URLS.SETTINGS, {
           headers: {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache',

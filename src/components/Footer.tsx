@@ -1,6 +1,7 @@
 import { MapPin, Phone, Mail, Globe, ExternalLink, ChevronLeft, ChevronRight, Youtube, Facebook, Instagram } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useState, useEffect } from 'react';
+import { API_URLS } from '../lib/apiConfig';
 import arcLogo from '@/assets/arc/ARC_logo.png';
 
 // Import sponsor images
@@ -76,7 +77,7 @@ const Footer = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v2/settings/', {
+        const response = await fetch(API_URLS.SETTINGS, {
           headers: {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache',

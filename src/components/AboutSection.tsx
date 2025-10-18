@@ -4,6 +4,7 @@ import { useLocale } from '@/contexts/LocaleContext';
 import { motion } from 'framer-motion';
 import AnimatedSection from './AnimatedSection';
 import { useState, useEffect } from 'react';
+import { API_URLS } from '../lib/apiConfig';
 
 const AboutSection = () => {
   const { t } = useLocale();
@@ -50,7 +51,7 @@ const AboutSection = () => {
       try {
         // Add cache-busting headers to force fresh data
         const timestamp = Date.now();
-        const listResponse = await fetch('http://localhost:8000/api/v2/pages/?type=cms_app.HomePage', {
+        const listResponse = await fetch(`${API_URLS.PAGES}?type=cms_app.HomePage`, {
           headers: {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache',
@@ -61,7 +62,7 @@ const AboutSection = () => {
         
         if (listData.items && listData.items.length > 0) {
           const homePageId = listData.items[0].id;
-          const detailResponse = await fetch(`http://localhost:8000/api/v2/pages/${homePageId}/`, {
+          const detailResponse = await fetch(`${API_URLS.PAGES}${homePageId}/`, {
             headers: {
               'Cache-Control': 'no-cache',
               'Pragma': 'no-cache',
