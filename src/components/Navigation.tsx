@@ -10,7 +10,7 @@ const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, isRTL } = useLocale();
   const [siteSettings, setSiteSettings] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch site settings including navigation items
   useEffect(() => {

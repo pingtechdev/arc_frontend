@@ -32,7 +32,7 @@ const Footer = () => {
   const sponsorsPerSlide = 4;
   const organizersPerSlide = 4;
   const [siteSettings, setSiteSettings] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Default sponsors fallback
   const defaultSponsors = [

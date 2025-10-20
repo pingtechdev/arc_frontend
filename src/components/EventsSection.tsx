@@ -10,7 +10,7 @@ const EventsSection = () => {
   const { t } = useLocale();
   const [events, setEvents] = useState<any[]>([]);
   const [ctaData, setCtaData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Fallback events
   const defaultEvents = [

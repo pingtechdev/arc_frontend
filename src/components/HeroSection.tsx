@@ -25,7 +25,7 @@ const HeroSection = () => {
   
   // CMS Content State
   const [cmsContent, setCmsContent] = useState<any>(null);
-  const [isLoadingCMS, setIsLoadingCMS] = useState(true);
+  const [isLoadingCMS, setIsLoadingCMS] = useState(false); // Start as false to prevent flash
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([]);
   const [heroImages, setHeroImages] = useState<string[]>([]);
   
@@ -144,12 +144,7 @@ const HeroSection = () => {
 
   return (
     <section id="home" className="relative w-full overflow-hidden" style={{ minHeight: 'calc(100vh - 80px)' }}>
-      {/* CMS Loading Indicator */}
-      {isLoadingCMS && (
-        <div className="fixed top-20 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm">
-          🔄 Loading CMS content...
-        </div>
-      )}
+      {/* CMS Loading Indicator - Removed to prevent flash on page load */}
       
       {/* Full Screen Image Carousel - Now from CMS */}
       <div className="absolute inset-0 w-full h-full" style={{ top: '80px' }}>

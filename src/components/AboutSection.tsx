@@ -160,11 +160,11 @@ const AboutSection = () => {
         <AnimatedSection className="text-center mb-16">
           <h2 className="text-heading text-4xl md:text-5xl mb-6">
             <span className="text-gradient">
-              {aboutContent?.title || 'Loading...'}
+              {aboutContent?.title || t('aboutTitle')}
             </span>
           </h2>
           <p className="text-body-lg text-muted-foreground max-w-3xl mx-auto">
-            {aboutContent?.content || 'Loading...'}
+            {aboutContent?.content || t('aboutDescription')}
           </p>
         </AnimatedSection>
 

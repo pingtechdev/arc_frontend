@@ -15,7 +15,7 @@ const GallerySection = () => {
   const { t } = useLocale();
   const [galleryImages, setGalleryImages] = useState<any[]>([]);
   const [youtubeVideos, setYoutubeVideos] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch gallery images from CMS
   useEffect(() => {
