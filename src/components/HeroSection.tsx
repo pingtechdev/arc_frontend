@@ -51,35 +51,17 @@ const HeroSection = () => {
   useEffect(() => {
     const fetchCMSContent = async () => {
       try {
-        // Fetch home page list with cache-busting
-        const listResponse = await fetch(`${API_URLS.PAGES}?type=cms_app.HomePage`, {
-          headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-          }
-        });
-        const listData = await listResponse.json();
+        // Use the Wagtail API service
+        const { fetchHomePage } = await import('@/services/wagtailApi');
+        const homePageData = await fetchHomePage();
         
-        if (listData.items && listData.items.length > 0) {
-          const homePageId = listData.items[0].id;
-          
-          // Fetch full details with cache-busting
-          const detailResponse = await fetch(`${API_URLS.PAGES}${homePageId}/`, {
-            headers: {
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache',
-              'Expires': '0'
-            }
-          });
-          const detailData = await detailResponse.json();
-          
-          console.log('✅ CMS Content loaded:', detailData);
-          setCmsContent(detailData);
+        if (homePageData) {
+          console.log('✅ CMS Content loaded:', homePageData);
+          setCmsContent(homePageData);
           
           // Extract hero blocks from body
-          if (detailData.body && Array.isArray(detailData.body)) {
-            const heroBlocks = detailData.body.filter((block: any) => block.type === 'hero');
+          if (homePageData.body && Array.isArray(homePageData.body)) {
+            const heroBlocks = homePageData.body.filter((block: any) => block.type === 'hero');
             
             console.log('🎬 Found hero blocks:', heroBlocks);
             

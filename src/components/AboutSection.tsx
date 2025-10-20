@@ -49,33 +49,17 @@ const AboutSection = () => {
   useEffect(() => {
     const fetchAboutContent = async () => {
       try {
-        // Add cache-busting headers to force fresh data
-        const timestamp = Date.now();
-        const listResponse = await fetch(`${API_URLS.PAGES}?type=cms_app.HomePage`, {
-          headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-          }
-        });
-        const listData = await listResponse.json();
+        // Use the Wagtail API service
+        const { fetchHomePage } = await import('@/services/wagtailApi');
+        const homePageData = await fetchHomePage();
         
-        if (listData.items && listData.items.length > 0) {
-          const homePageId = listData.items[0].id;
-          const detailResponse = await fetch(`${API_URLS.PAGES}${homePageId}/`, {
-            headers: {
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache',
-              'Expires': '0'
-            }
-          });
-          const detailData = await detailResponse.json();
+        if (homePageData) {
           
-          if (detailData.body && Array.isArray(detailData.body)) {
-            console.log('🔍 All body blocks:', detailData.body.map((b: any) => b.type));
+          if (homePageData.body && Array.isArray(homePageData.body)) {
+            console.log('🔍 All body blocks:', homePageData.body.map((b: any) => b.type));
             
             // Extract about blocks (main content)
-            const aboutBlocks = detailData.body.filter((block: any) => block.type === 'about');
+            const aboutBlocks = homePageData.body.filter((block: any) => block.type === 'about');
             if (aboutBlocks.length > 0) {
               const aboutBlock = aboutBlocks[0];
               const cleanContent = aboutBlock.value?.content?.replace(/<[^>]*>/g, '').trim() || '';

@@ -6,7 +6,7 @@
 // Main API Configuration
 export const API_CONFIG = {
   // Base URL for the backend API
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://api.arc.pingtech.dev:8001',
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://api.arc.pingtech.dev',
   
   // Wagtail CMS API endpoints
   WAGTAIL_API_BASE: '/api/v2',
@@ -25,8 +25,8 @@ export const API_CONFIG = {
   FALLBACK_URLS: [
     '/media/documents/',  // Primary: Wagtail documents
     '/media/rules/',       // Secondary: Rules folder
-    'https://api.arc.pingtech.dev:8001/media/documents/',
-    'https://api.arc.pingtech.dev:8001/media/rules/',
+    'https://api.arc.pingtech.dev/media/documents/',
+    'https://api.arc.pingtech.dev/media/rules/',
     'http://localhost:8001/media/documents/',
     'http://localhost:8001/media/rules/'
   ]

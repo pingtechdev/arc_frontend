@@ -38,9 +38,20 @@ export const fetchPages = async (params?: Record<string, string>): Promise<Wagta
   const queryParams = new URLSearchParams(params);
   const url = `${API_BASE_URL}/pages/${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
   
-  const response = await fetch(url);
+  console.log('🌐 Fetching from:', url);
+  
+  const response = await fetch(url, {
+    headers: {
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    }
+  });
+  
   if (!response.ok) {
-    throw new Error(`Failed to fetch pages: ${response.statusText}`);
+    const errorText = await response.text();
+    console.error('❌ API Error:', response.status, response.statusText, errorText);
+    throw new Error(`Failed to fetch pages: ${response.status} ${response.statusText} - ${errorText}`);
   }
   
   return response.json();
@@ -70,13 +81,24 @@ export const fetchPageBySlug = async (slug: string): Promise<WagtailPage | null>
  * Fetch home page with full details
  */
 export const fetchHomePage = async (): Promise<WagtailPage | null> => {
-  const response = await fetchPages({ type: 'cms_app.HomePage' });
-  if (response.items.length > 0) {
-    // Fetch the full page details using the detail URL
-    const pageId = response.items[0].id;
-    return await fetchPageById(pageId);
+  try {
+    console.log('🔄 Fetching home page...');
+    const response = await fetchPages({ type: 'cms_app.HomePage' });
+    
+    if (response.items.length > 0) {
+      console.log('📄 Found home page, fetching details...');
+      const pageId = response.items[0].id;
+      const pageData = await fetchPageById(pageId);
+      console.log('✅ Home page data loaded:', pageData);
+      return pageData;
+    }
+    
+    console.log('⚠️ No home page found');
+    return null;
+  } catch (error) {
+    console.error('❌ Error fetching home page:', error);
+    throw error;
   }
-  return null;
 };
 
 /**
