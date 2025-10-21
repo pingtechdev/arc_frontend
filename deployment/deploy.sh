@@ -9,6 +9,9 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/config.sh"
 
+# Change to the deployment directory to ensure we're in the right place
+cd "$SCRIPT_DIR"
+
 # Validate configuration
 if ! validate_config; then
     print_error "Configuration validation failed."
@@ -102,8 +105,21 @@ build_project() {
 setup_nginx() {
     print_status "Setting up nginx configuration..."
     
-    # Create nginx configuration with variables substituted
-    envsubst < nginx/arc_frontend.conf > /tmp/arc_frontend.conf
+    # Check if envsubst is available
+    if command -v envsubst >/dev/null 2>&1; then
+        # Create nginx configuration with variables substituted
+        envsubst < nginx/arc_frontend.conf > /tmp/arc_frontend.conf
+    else
+        print_warning "envsubst not found, using sed for variable substitution..."
+        # Use sed to substitute variables
+        sed -e "s|\${FRONTEND_DOMAIN}|$FRONTEND_DOMAIN|g" \
+            -e "s|\${BACKEND_DOMAIN}|$BACKEND_DOMAIN|g" \
+            -e "s|\${FRONTEND_DIST_DIR}|$FRONTEND_DIST_DIR|g" \
+            -e "s|\${SSL_CERT_FRONTEND}|$SSL_CERT_FRONTEND|g" \
+            -e "s|\${SSL_KEY_FRONTEND}|$SSL_KEY_FRONTEND|g" \
+            -e "s|\${NGINX_LOG_DIR}|$NGINX_LOG_DIR|g" \
+            nginx/arc_frontend.conf > /tmp/arc_frontend.conf
+    fi
     
     # Copy nginx configuration
     sudo cp /tmp/arc_frontend.conf "$NGINX_SITES_AVAILABLE/arc_frontend.conf"
