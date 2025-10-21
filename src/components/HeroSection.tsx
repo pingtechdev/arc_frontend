@@ -25,32 +25,15 @@ const HeroSection = () => {
   
   // CMS Content State
   const [cmsContent, setCmsContent] = useState<any>(null);
-  const [isLoadingCMS, setIsLoadingCMS] = useState(false); // Start as false to prevent flash
+  const [isLoadingCMS, setIsLoadingCMS] = useState(true);
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([]);
   const [heroImages, setHeroImages] = useState<string[]>([]);
-  
-  // Default fallback slides
-  const defaultSlides: HeroSlide[] = [
-    {
-      title: t('heroText1'),
-      description: t('heroDesc1')
-    },
-    {
-      title: t('heroText2'),
-      description: t('heroDesc2')
-    },
-    {
-      title: t('heroText3'),
-      description: t('heroDesc3')
-    }
-  ];
-  
-  const defaultImages = [heroImage1, heroImage2, heroImage3];
   
   // Fetch content from Wagtail CMS
   useEffect(() => {
     const fetchCMSContent = async () => {
       try {
+        setIsLoadingCMS(true);
         // Use the Wagtail API service
         const { fetchHomePage } = await import('@/services/wagtailApi');
         const homePageData = await fetchHomePage();
@@ -94,26 +77,21 @@ const HeroSection = () => {
                 })
                 .filter((url: string | undefined) => url);
               
-              setHeroImages(images.length > 0 ? images : defaultImages);
+              setHeroImages(images);
               
               console.log('✨ Slides created:', slides);
               console.log('🖼️ Images extracted:', images);
             } else {
-              // No hero blocks, use defaults
-              setHeroSlides(defaultSlides);
-              setHeroImages(defaultImages);
+              console.warn('⚠️ No hero blocks found in CMS content');
             }
           } else {
-            // No body content, use defaults
-            setHeroSlides(defaultSlides);
-            setHeroImages(defaultImages);
+            console.warn('⚠️ No body content found in CMS');
           }
+        } else {
+          console.warn('⚠️ No home page data found');
         }
       } catch (error) {
         console.error('❌ Failed to load CMS content:', error);
-        // On error, use defaults
-        setHeroSlides(defaultSlides);
-        setHeroImages(defaultImages);
       } finally {
         setIsLoadingCMS(false);
       }
@@ -122,9 +100,9 @@ const HeroSection = () => {
     fetchCMSContent();
   }, []);
   
-  // Use slides from CMS or fallback to defaults
-  const activeSlides = heroSlides.length > 0 ? heroSlides : defaultSlides;
-  const activeImages = heroImages.length > 0 ? heroImages : defaultImages;
+  // Only use CMS content - no fallbacks
+  const activeSlides = heroSlides;
+  const activeImages = heroImages;
   
   // Auto-rotate slides
   useEffect(() => {
@@ -142,10 +120,25 @@ const HeroSection = () => {
     }
   };
 
+  // Show loading state if CMS is still loading or no content
+  if (isLoadingCMS || activeSlides.length === 0) {
+    return (
+      <section id="home" className="relative w-full overflow-hidden" style={{ minHeight: 'calc(100vh - 80px)' }}>
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center" style={{ top: '80px' }}>
+          <div className="text-center text-white">
+            <div className="w-16 h-16 mx-auto bg-red-600 rounded-full flex items-center justify-center mb-4 animate-pulse">
+              <Zap className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">Loading Content...</h2>
+            <p className="text-gray-300">Preparing your experience</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="home" className="relative w-full overflow-hidden" style={{ minHeight: 'calc(100vh - 80px)' }}>
-      {/* CMS Loading Indicator - Removed to prevent flash on page load */}
-      
       {/* Full Screen Image Carousel - Now from CMS */}
       <div className="absolute inset-0 w-full h-full" style={{ top: '80px' }}>
         <AnimatePresence mode="wait">
