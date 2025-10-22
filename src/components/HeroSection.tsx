@@ -264,7 +264,7 @@ const HeroSection = () => {
             </AnimatedSection>
 
             {/* Stats */}
-            <AnimatedSection delay={0.7} direction="up">
+            {/* <AnimatedSection delay={0.7} direction="up">
               <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 drop-shadow-lg">500+</div>
@@ -279,7 +279,7 @@ const HeroSection = () => {
                   <div className="text-sm md:text-base text-white drop-shadow-md">Competition Days</div>
                 </div>
               </div>
-            </AnimatedSection>
+            </AnimatedSection> */}
           </div>
         </div>
       </div>
