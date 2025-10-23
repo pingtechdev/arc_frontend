@@ -97,57 +97,25 @@ const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) 
     return fileType?.toLowerCase() || 'pdf';
   };
 
-  // Extract actual filename from Wagtail document structure
-  const getActualFilename = (document: any): string | null => {
-    console.log('🔍 Extracting filename from document structure:', document);
+  // Get the document URL directly from Wagtail
+  const getDocumentUrl = (document: any): string | null => {
+    console.log('🔍 Getting document URL from:', document);
     
-    // Try to extract filename from Wagtail document URL
+    // If we have a direct URL from Wagtail, use it
     if (document.document?.url) {
       const url = document.document.url;
-      console.log('📄 Document URL found:', url);
-      const filename = url.split('/').pop();
-      console.log('📄 Extracted filename from URL:', filename);
-      if (filename && filename.includes('.')) {
-        return filename;
-      }
+      console.log('📄 Using Wagtail document URL:', url);
+      return url;
     }
     
-    // Try to extract from file path
+    // If we have a file path, construct the URL
     if (document.document?.file) {
       const file = document.document.file;
-      console.log('📁 Document file path found:', file);
-      const filename = file.split('/').pop();
-      console.log('📁 Extracted filename from file path:', filename);
-      if (filename && filename.includes('.')) {
-        return filename;
-      }
+      console.log('📁 Using document file path:', file);
+      return file;
     }
     
-    // Try to extract from document title or other fields
-    if (document.document?.title) {
-      console.log('📝 Document title found:', document.document.title);
-      // Check if title contains a file extension
-      if (document.document.title.includes('.')) {
-        return document.document.title;
-      }
-    }
-    
-    // Manual mapping for known documents (temporary solution)
-    const documentMappings: { [key: string]: string } = {
-      'click to view cv': 'MyCV.pdf',
-      'click to see rules': 'RGB_logo.pdf',
-      'competition rules': 'comp_rules.pdf',
-      'safety guidelines': 'safety_guidelines.pdf',
-      'technical specifications': 'tech_specs.pdf'
-    };
-    
-    const displayName = document.name?.toLowerCase();
-    if (displayName && documentMappings[displayName]) {
-      console.log('🗺️ Found mapping for:', displayName, '->', documentMappings[displayName]);
-      return documentMappings[displayName];
-    }
-    
-    console.log('❌ No actual filename found in document structure');
+    console.log('❌ No document URL found');
     return null;
   };
 
@@ -157,32 +125,9 @@ const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) 
     try {
       console.log('Document structure:', document);
       
-      // First try to get the document URL from the CMS structure
-      let documentUrl = null;
+      // Get the document URL directly from Wagtail
+      let documentUrl = getDocumentUrl(document);
       
-      // Check if we have a document object with URL
-      if (document.document?.url) {
-        documentUrl = document.document.url;
-        console.log('Using Wagtail document URL:', documentUrl);
-      } else if (document.document?.file) {
-        documentUrl = document.document.file;
-        console.log('Using document file path:', documentUrl);
-      } else if (document.document?.id) {
-        // Try to fetch from Wagtail API
-        try {
-          console.log('Fetching document details from Wagtail API for ID:', document.document.id);
-          const response = await fetch(`${API_URLS.DOCUMENTS}${document.document.id}/`);
-          if (response.ok) {
-            const data = await response.json();
-            documentUrl = data.url;
-            console.log('Fetched document URL from API:', documentUrl);
-          }
-        } catch (apiError) {
-          console.warn('Failed to fetch document from API:', apiError);
-        }
-      }
-      
-      // If we have a URL, open it
       if (documentUrl) {
         // Ensure the URL is absolute
         if (documentUrl.startsWith('/')) {
@@ -191,27 +136,12 @@ const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) 
           documentUrl = `${baseUrl}${documentUrl}`;
         }
         console.log('Opening document URL:', documentUrl);
-        console.log('Document name from CMS:', document.name);
-        console.log('Document structure:', document);
         window.open(documentUrl, '_blank', 'noopener,noreferrer');
         setDocumentExists(true);
       } else {
-        console.log('No document URL found, trying fallback...');
-        // Try to extract actual filename from Wagtail document structure
-        const actualFilename = getActualFilename(document);
-        const filenameForUrl = actualFilename || document.filename || document.name;
-        console.log('Using filename for fallback:', filenameForUrl);
-        
-        const fallbackUrl = await findWorkingMediaUrl(filenameForUrl);
-        if (fallbackUrl) {
-          console.log('Using fallback URL:', fallbackUrl);
-          window.open(fallbackUrl, '_blank', 'noopener,noreferrer');
-          setDocumentExists(true);
-        } else {
-          // Final fallback to the original openPDF function
-          await openPDF(document);
-          setDocumentExists(true);
-        }
+        console.log('No document URL found');
+        setDocumentExists(false);
+        alert('Document not found. Please check if the file is properly uploaded in the CMS.');
       }
     } catch (error) {
       console.error('Error opening document:', error);
@@ -226,37 +156,8 @@ const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) 
     try {
       console.log('Document structure for download:', document);
       
-      let documentUrl = null;
-      
-      // Check if we have a document object with URL
-      if (document.document?.url) {
-        documentUrl = document.document.url;
-        console.log('Using Wagtail document URL for download:', documentUrl);
-      } else if (document.document?.file) {
-        documentUrl = document.document.file;
-        console.log('Using document file path for download:', documentUrl);
-      } else if (document.document?.id) {
-        // Try to fetch from Wagtail API
-        try {
-          console.log('Fetching document details from Wagtail API for download, ID:', document.document.id);
-          const response = await fetch(`${API_URLS.DOCUMENTS}${document.document.id}/`);
-          if (response.ok) {
-            const data = await response.json();
-            documentUrl = data.url;
-            console.log('Fetched document URL from API for download:', documentUrl);
-          }
-        } catch (apiError) {
-          console.warn('Failed to fetch document from API:', apiError);
-        }
-      }
-      
-      // If still no URL, try fallback with case preservation
-      if (!documentUrl) {
-        const actualFilename = getActualFilename(document);
-        const filenameForUrl = actualFilename || document.filename || document.name;
-        console.log('Using filename for download fallback:', filenameForUrl);
-        documentUrl = await findWorkingMediaUrl(filenameForUrl);
-      }
+      // Get the document URL directly from Wagtail
+      let documentUrl = getDocumentUrl(document);
       
       if (documentUrl) {
         // Ensure the URL is absolute
@@ -268,11 +169,10 @@ const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) 
         
         console.log('Downloading document URL:', documentUrl);
         
-        // Get the proper file extension and filename
-        const actualFilename = getActualFilename(document);
-        const filenameForDownload = actualFilename || document.filename || document.name;
-        const fileExtension = getFileExtension(filenameForDownload, document.file_type);
-        const downloadFilename = filenameForDownload.includes('.') ? filenameForDownload : `${filenameForDownload}.${fileExtension}`;
+        // Get the filename from the URL or use the document name
+        const urlFilename = documentUrl.split('/').pop() || document.name;
+        const fileExtension = getFileExtension(urlFilename, document.file_type);
+        const downloadFilename = urlFilename.includes('.') ? urlFilename : `${urlFilename}.${fileExtension}`;
         
         // Use window.document to avoid conflict with the document prop
         const link = window.document.createElement('a');
@@ -288,7 +188,7 @@ const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) 
       }
     } catch (error) {
       console.error('Error downloading document:', error);
-      alert('Error downloading document file.');
+      alert('Error downloading document. Please try again.');
     }
   };
 
