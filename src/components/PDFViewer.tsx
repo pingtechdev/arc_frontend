@@ -99,10 +99,14 @@ const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) 
 
   // Extract actual filename from Wagtail document structure
   const getActualFilename = (document: any): string | null => {
+    console.log('🔍 Extracting filename from document structure:', document);
+    
     // Try to extract filename from Wagtail document URL
     if (document.document?.url) {
       const url = document.document.url;
+      console.log('📄 Document URL found:', url);
       const filename = url.split('/').pop();
+      console.log('📄 Extracted filename from URL:', filename);
       if (filename && filename.includes('.')) {
         return filename;
       }
@@ -111,12 +115,39 @@ const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) 
     // Try to extract from file path
     if (document.document?.file) {
       const file = document.document.file;
+      console.log('📁 Document file path found:', file);
       const filename = file.split('/').pop();
+      console.log('📁 Extracted filename from file path:', filename);
       if (filename && filename.includes('.')) {
         return filename;
       }
     }
     
+    // Try to extract from document title or other fields
+    if (document.document?.title) {
+      console.log('📝 Document title found:', document.document.title);
+      // Check if title contains a file extension
+      if (document.document.title.includes('.')) {
+        return document.document.title;
+      }
+    }
+    
+    // Manual mapping for known documents (temporary solution)
+    const documentMappings: { [key: string]: string } = {
+      'click to view cv': 'MyCV.pdf',
+      'click to see rules': 'RGB_logo.pdf',
+      'competition rules': 'comp_rules.pdf',
+      'safety guidelines': 'safety_guidelines.pdf',
+      'technical specifications': 'tech_specs.pdf'
+    };
+    
+    const displayName = document.name?.toLowerCase();
+    if (displayName && documentMappings[displayName]) {
+      console.log('🗺️ Found mapping for:', displayName, '->', documentMappings[displayName]);
+      return documentMappings[displayName];
+    }
+    
+    console.log('❌ No actual filename found in document structure');
     return null;
   };
 
