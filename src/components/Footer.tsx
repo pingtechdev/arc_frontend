@@ -5,25 +5,25 @@ import { API_URLS } from '../lib/apiConfig';
 import arcLogo from '@/assets/arc/ARC_logo.png';
 
 // Import sponsor images
-import sponsor1 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.41 PM (1).jpeg';
-import sponsor2 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.41 PM (2).jpeg';
-import sponsor3 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.41 PM (3).jpeg';
-import sponsor4 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.41 PM.jpeg';
-import sponsor5 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (1).jpeg';
-import sponsor6 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (2).jpeg';
-import sponsor7 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (3).jpeg';
-import sponsor8 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (4).jpeg';
-import sponsor9 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (5).jpeg';
-import sponsor10 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (6).jpeg';
-import sponsor11 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (7).jpeg';
-import sponsor12 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (8).jpeg';
-import sponsor13 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (9).jpeg';
-import sponsor14 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (10).jpeg';
-import sponsor15 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (11).jpeg';
-import sponsor16 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (12).jpeg';
-import sponsor17 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (13).jpeg';
-import sponsor18 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (14).jpeg';
-import sponsor19 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM.jpeg';
+import sponsor1 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.41 PM (2).jpeg';
+import sponsor2 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.41 PM (3).jpeg';
+import sponsor3 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.41 PM.jpeg';
+import sponsor4 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (1).jpeg';
+import sponsor5 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (2).jpeg';
+import sponsor6 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (3).jpeg';
+import sponsor7 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (4).jpeg';
+import sponsor8 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (5).jpeg';
+import sponsor9 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (6).jpeg';
+import sponsor10 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (7).jpeg';
+import sponsor11 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (8).jpeg';
+import sponsor12 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (9).jpeg';
+import sponsor13 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (10).jpeg';
+import sponsor14 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (11).jpeg';
+import sponsor15 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (12).jpeg';
+import sponsor16 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (13).jpeg';
+import sponsor17 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM (14).jpeg';
+import sponsor18 from '@/assets/sponsors/WhatsApp Image 2025-09-30 at 2.23.42 PM.jpeg';
+import sponsor19 from '@/assets/sponsors/usal.jpeg';
 
 const Footer = () => {
   const { t } = useLocale();
