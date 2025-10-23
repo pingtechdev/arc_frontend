@@ -37,6 +37,16 @@ const Navigation = () => {
   }, []);
 
   const scrollToSection = (sectionId: string) => {
+    // Special handling for organizers - scroll to footer
+    if (sectionId === 'organizers') {
+      const footer = document.querySelector('footer');
+      if (footer) {
+        footer.scrollIntoView({ behavior: 'smooth' });
+        setIsMenuOpen(false);
+        return;
+      }
+    }
+    
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });

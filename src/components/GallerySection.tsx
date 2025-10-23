@@ -3,6 +3,8 @@ import AnimatedSection from './AnimatedSection';
 import UnifiedGallery from './UnifiedGallery';
 import { useState, useEffect } from 'react';
 import { API_URLS } from '../lib/apiConfig';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Play, ExternalLink } from 'lucide-react';
 
 // Helper function to extract YouTube video ID from URL
 const extractVideoId = (url: string): string => {
@@ -16,6 +18,8 @@ const GallerySection = () => {
   const [galleryImages, setGalleryImages] = useState<any[]>([]);
   const [youtubeVideos, setYoutubeVideos] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<any>(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   // Fetch gallery images from CMS
   useEffect(() => {
@@ -87,6 +91,16 @@ const GallerySection = () => {
     fetchGalleryContent();
   }, []);
 
+  const openVideoModal = (video: any) => {
+    setSelectedVideo(video);
+    setIsVideoModalOpen(true);
+  };
+
+  const closeVideoModal = () => {
+    setIsVideoModalOpen(false);
+    setSelectedVideo(null);
+  };
+
   return (
     <section id="gallery" className="section-py">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -119,7 +133,10 @@ const GallerySection = () => {
               {youtubeVideos.map((video, index) => (
                 <div key={index} className="group">
                   <div className="relative overflow-hidden rounded-xl bg-muted/30 border border-border/50 hover:border-secondary/50 transition-all duration-300 hover:glow-tech">
-                    <div className="aspect-video relative">
+                    <div 
+                      className="aspect-video relative cursor-pointer"
+                      onClick={() => openVideoModal(video)}
+                    >
                       <img 
                         src={video.thumbnail || `https://img.youtube.com/vi/${extractVideoId(video.youtubeUrl)}/maxresdefault.jpg`}
                         alt={video.title}
@@ -127,9 +144,7 @@ const GallerySection = () => {
                       />
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/20 transition-all duration-300">
                         <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
-                          <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z"/>
-                          </svg>
+                          <Play className="w-8 h-8 text-white ml-1" />
                         </div>
                       </div>
                     </div>
@@ -142,17 +157,24 @@ const GallerySection = () => {
                           {video.description}
                         </p>
                       )}
-                      <a 
-                        href={video.youtubeUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center text-sm font-medium text-secondary hover:text-secondary/80 transition-colors"
-                      >
-                        Watch on YouTube
-                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      </a>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => openVideoModal(video)}
+                          className="inline-flex items-center text-sm font-medium text-secondary hover:text-secondary/80 transition-colors"
+                        >
+                          <Play className="w-4 h-4 mr-1" />
+                          Play Video
+                        </button>
+                        <a 
+                          href={video.youtubeUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-secondary transition-colors"
+                        >
+                          <ExternalLink className="w-4 h-4 mr-1" />
+                          Watch on YouTube
+                        </a>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -160,6 +182,68 @@ const GallerySection = () => {
             </div>
           </AnimatedSection>
         )}
+
+        {/* YouTube Video Modal */}
+        <AnimatePresence>
+          {isVideoModalOpen && selectedVideo && (
+            <motion.div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeVideoModal}
+            >
+              <motion.div
+                className="relative max-w-6xl max-h-[90vh] w-full mx-4 bg-white rounded-2xl overflow-hidden"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Close Button */}
+                <button
+                  onClick={closeVideoModal}
+                  className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+
+                {/* Video Content */}
+                <div className="relative">
+                  <div className="aspect-video">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${extractVideoId(selectedVideo.youtubeUrl)}?autoplay=1&rel=0&modestbranding=1`}
+                      title={selectedVideo.title}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                  
+                  {/* Video Info */}
+                  <div className="p-6 bg-white">
+                    <h3 className="text-2xl font-bold mb-2">{selectedVideo.title}</h3>
+                    {selectedVideo.description && (
+                      <p className="text-muted-foreground mb-4">{selectedVideo.description}</p>
+                    )}
+                    <div className="flex space-x-4">
+                      <a 
+                        href={selectedVideo.youtubeUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-sm font-medium text-secondary hover:text-secondary/80 transition-colors"
+                      >
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        Watch on YouTube
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </section>
   );

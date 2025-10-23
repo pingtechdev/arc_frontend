@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Play, Image as ImageIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, Image as ImageIcon, X, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocale } from '@/contexts/LocaleContext';
 
@@ -42,6 +42,10 @@ interface UnifiedGalleryProps {
 const UnifiedGallery = ({ className = '', title, description, cmsImages = [] }: UnifiedGalleryProps) => {
   const { t } = useLocale();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalIndex, setModalIndex] = useState(0);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isVideoMuted, setIsVideoMuted] = useState(true);
 
   // Default media array with both videos and images
   const defaultMediaItems = [
@@ -129,6 +133,35 @@ const UnifiedGallery = ({ className = '', title, description, cmsImages = [] }: 
     setActiveIndex((prev) => (prev - 1 + mediaItems.length) % mediaItems.length);
   };
 
+  const openModal = (index: number) => {
+    setModalIndex(index);
+    setIsModalOpen(true);
+    setIsVideoPlaying(false);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setIsVideoPlaying(false);
+  };
+
+  const nextModalMedia = () => {
+    setModalIndex((prev) => (prev + 1) % mediaItems.length);
+    setIsVideoPlaying(false);
+  };
+
+  const prevModalMedia = () => {
+    setModalIndex((prev) => (prev - 1 + mediaItems.length) % mediaItems.length);
+    setIsVideoPlaying(false);
+  };
+
+  const toggleVideoPlay = () => {
+    setIsVideoPlaying(!isVideoPlaying);
+  };
+
+  const toggleVideoMute = () => {
+    setIsVideoMuted(!isVideoMuted);
+  };
+
   return (
     <div className={`w-full ${className}`}>
       {/* Header */}
@@ -166,9 +199,10 @@ const UnifiedGallery = ({ className = '', title, description, cmsImages = [] }: 
         transition={{ duration: 0.6, delay: 0.3 }}
       >
         <motion.div 
-          className="relative aspect-video bg-muted/30 rounded-2xl overflow-hidden"
+          className="relative aspect-video bg-muted/30 rounded-2xl overflow-hidden cursor-pointer"
           whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.3 }}
+          onClick={() => openModal(activeIndex)}
         >
           <AnimatePresence mode="wait">
             <motion.div
@@ -311,7 +345,10 @@ const UnifiedGallery = ({ className = '', title, description, cmsImages = [] }: 
           {mediaItems.map((item, index) => (
             <motion.button
               key={index}
-              onClick={() => setActiveIndex(index)}
+              onClick={() => {
+                setActiveIndex(index);
+                openModal(index);
+              }}
               className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 flex-shrink-0 ${
                 index === activeIndex 
                   ? 'border-red-500 scale-110' 
@@ -370,6 +407,104 @@ const UnifiedGallery = ({ className = '', title, description, cmsImages = [] }: 
           {activeIndex + 1} of {mediaItems.length}
         </motion.span>
       </motion.div>
+
+      {/* Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeModal}
+          >
+            <motion.div
+              className="relative max-w-6xl max-h-[90vh] w-full mx-4 bg-white rounded-2xl overflow-hidden"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={closeModal}
+                className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              {/* Modal Content */}
+              <div className="relative">
+                {mediaItems[modalIndex].type === 'video' ? (
+                  <div className="relative">
+                    <video
+                      src={mediaItems[modalIndex].src}
+                      poster={mediaItems[modalIndex].poster}
+                      className="w-full h-auto max-h-[70vh] object-contain"
+                      controls
+                      autoPlay={isVideoPlaying}
+                      muted={isVideoMuted}
+                      loop
+                    />
+                    {/* Video Controls Overlay */}
+                    <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={toggleVideoPlay}
+                          className="w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                        >
+                          {isVideoPlaying ? (
+                            <X className="h-4 w-4" />
+                          ) : (
+                            <Play className="h-4 w-4" />
+                          )}
+                        </button>
+                        <button
+                          onClick={toggleVideoMute}
+                          className="w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                        >
+                          {isVideoMuted ? (
+                            <VolumeX className="h-4 w-4" />
+                          ) : (
+                            <Volume2 className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <img
+                    src={mediaItems[modalIndex].src}
+                    alt={mediaItems[modalIndex].title}
+                    className="w-full h-auto max-h-[70vh] object-contain"
+                  />
+                )}
+
+                {/* Media Info */}
+                <div className="p-6 bg-white">
+                  <h3 className="text-2xl font-bold mb-2">{mediaItems[modalIndex].title}</h3>
+                  <p className="text-muted-foreground">{mediaItems[modalIndex].description}</p>
+                </div>
+
+                {/* Navigation Buttons */}
+                <button
+                  onClick={prevModalMedia}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </button>
+                <button
+                  onClick={nextModalMedia}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

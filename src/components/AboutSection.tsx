@@ -49,11 +49,12 @@ const AboutSection = () => {
   useEffect(() => {
     const fetchAboutContent = async () => {
       try {
-        // Use the Wagtail API service
+        // Use the Wagtail API service with cache busting
         const { fetchHomePage } = await import('@/services/wagtailApi');
         const homePageData = await fetchHomePage();
         
         if (homePageData) {
+          console.log('✅ Home page data received:', homePageData);
           
           if (homePageData.body && Array.isArray(homePageData.body)) {
             console.log('🔍 All body blocks:', homePageData.body.map((b: any) => b.type));
@@ -72,14 +73,18 @@ const AboutSection = () => {
             }
             
             // Extract stats
-            const statBlocks = detailData.body.filter((block: any) => block.type === 'about_stats');
+            const statBlocks = homePageData.body.filter((block: any) => block.type === 'about_stats');
+            console.log('🔍 Found stat blocks:', statBlocks.length);
             if (statBlocks.length > 0 && Array.isArray(statBlocks[0].value)) {
+              console.log('📊 About stats data:', statBlocks[0].value);
               setStats(statBlocks[0].value);
               console.log('📊 About stats loaded:', statBlocks[0].value);
+            } else {
+              console.log('⚠️ No stats blocks found or invalid format');
             }
             
             // Extract value cards
-            const valueCardBlocks = detailData.body.filter((block: any) => block.type === 'value_cards');
+            const valueCardBlocks = homePageData.body.filter((block: any) => block.type === 'value_cards');
             if (valueCardBlocks.length > 0 && Array.isArray(valueCardBlocks[0].value)) {
               const cmsValues = valueCardBlocks[0].value.map((v: any) => ({
                 icon: getIcon(v.icon_name),
@@ -177,7 +182,7 @@ const AboutSection = () => {
               {/* Stats Section */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6">
                 {stats.length > 0 ? stats.map((stat, index) => (
-                  <div key={index} className="text-center">
+                  <div key={`${stat.number}-${stat.label}-${index}`} className="text-center">
                     <div className="text-display text-3xl text-secondary">{stat.number}</div>
                     <div className="text-caption text-muted-foreground">{stat.label}</div>
                   </div>

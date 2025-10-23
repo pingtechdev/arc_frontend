@@ -3,6 +3,7 @@ import { Eye, Download, ExternalLink, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { openPDF, checkPDFExists, isPDFFile, getWagtailDocumentUrl } from '@/lib/pdfViewer';
 import { findWorkingMediaUrl } from '@/lib/mediaConfig';
+import { API_URLS } from '@/lib/apiConfig';
 
 interface PDFViewerProps {
   document: {
@@ -26,11 +27,40 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ document, className = '' }) => {
     setIsChecking(true);
     
     try {
-      await openPDF(document);
-      setPdfExists(true);
+      // First try to get the document URL from the CMS structure
+      let pdfUrl = null;
+      
+      // Check if we have a document object with URL
+      if (document.document?.url) {
+        pdfUrl = document.document.url;
+      } else if (document.document?.file) {
+        pdfUrl = document.document.file;
+      } else if (document.document?.id) {
+        // Try to fetch from Wagtail API
+        try {
+          const response = await fetch(`${API_URLS.DOCUMENTS}${document.document.id}/`);
+          if (response.ok) {
+            const data = await response.json();
+            pdfUrl = data.url;
+          }
+        } catch (apiError) {
+          console.warn('Failed to fetch document from API:', apiError);
+        }
+      }
+      
+      // If we have a URL, open it
+      if (pdfUrl) {
+        window.open(pdfUrl, '_blank', 'noopener,noreferrer');
+        setPdfExists(true);
+      } else {
+        // Fallback to the original openPDF function
+        await openPDF(document);
+        setPdfExists(true);
+      }
     } catch (error) {
       console.error('Error opening PDF:', error);
       setPdfExists(false);
+      alert('PDF not found. Please check if the document is properly uploaded in the CMS.');
     } finally {
       setIsChecking(false);
     }
@@ -38,11 +68,24 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ document, className = '' }) => {
 
   const handleDownloadPDF = async () => {
     try {
-      let pdfUrl = document.document?.url || document.document?.file;
+      let pdfUrl = null;
       
-      // If we have a document ID but no URL, try to fetch from Wagtail API
-      if (!pdfUrl && document.document?.id) {
-        pdfUrl = await getWagtailDocumentUrl(document.document.id);
+      // Check if we have a document object with URL
+      if (document.document?.url) {
+        pdfUrl = document.document.url;
+      } else if (document.document?.file) {
+        pdfUrl = document.document.file;
+      } else if (document.document?.id) {
+        // Try to fetch from Wagtail API
+        try {
+          const response = await fetch(`${API_URLS.DOCUMENTS}${document.document.id}/`);
+          if (response.ok) {
+            const data = await response.json();
+            pdfUrl = data.url;
+          }
+        } catch (apiError) {
+          console.warn('Failed to fetch document from API:', apiError);
+        }
       }
       
       // If still no URL, try fallback
@@ -59,7 +102,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ document, className = '' }) => {
         link.click();
         document.body.removeChild(link);
       } else {
-        alert('PDF file not found for download.');
+        alert('PDF file not found for download. Please check if the document is properly uploaded in the CMS.');
       }
     } catch (error) {
       console.error('Error downloading PDF:', error);
