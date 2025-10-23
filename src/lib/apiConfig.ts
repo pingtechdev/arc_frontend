@@ -51,7 +51,7 @@ export const getMediaUrl = (filename: string, path: string = API_CONFIG.RULES_PA
   // Preserve original filename case and only clean spaces and special characters
   const cleanFilename = filename
     .replace(/\s+/g, '-')
-    .replace(/[^a-zA-Z0-9-.]/g, '');
+    .replace(/[^a-zA-Z0-9-_.]/g, '');
   
   // Keep original extension if it exists
   const finalFilename = cleanFilename.includes('.') ? cleanFilename : `${cleanFilename}.pdf`;
@@ -68,7 +68,7 @@ export const getFallbackUrls = (filename: string): string[] => {
   // Preserve original filename case and only clean spaces and special characters
   const cleanFilename = filename
     .replace(/\s+/g, '-')
-    .replace(/[^a-zA-Z0-9-.]/g, '');
+    .replace(/[^a-zA-Z0-9-_.]/g, '');
   
   // Keep original extension if it exists
   const finalFilename = cleanFilename.includes('.') ? cleanFilename : `${cleanFilename}.pdf`;
