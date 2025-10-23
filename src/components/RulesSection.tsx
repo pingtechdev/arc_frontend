@@ -211,19 +211,35 @@ const RulesSection = () => {
               <div className="space-y-4">
                 {activeDocuments.map((document, index) => (
                   <AnimatedSection key={index} delay={index * 0.1} direction="slideRight" distance={30}>
-                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50 hover:border-secondary/50 transition-colors">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
-                          <FileText className="h-5 w-5 text-accent" />
-                        </div>
-                        <div>
-                          <div className="font-medium">{document.name}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {document.file_type || document.type} • {document.file_size || document.size}
+                    <div className="p-4 bg-muted/30 rounded-lg border border-border/50 hover:border-secondary/50 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-3 flex-1">
+                          <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <FileText className="h-5 w-5 text-accent" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-foreground">{document.name}</div>
+                            {document.description && (
+                              <div className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                                {document.description}
+                              </div>
+                            )}
+                            <div className="text-xs text-muted-foreground mt-2 flex items-center space-x-2">
+                              <span className="bg-muted px-2 py-1 rounded text-xs">
+                                {document.file_type || document.type || 'File'}
+                              </span>
+                              {document.file_size || document.size ? (
+                                <span className="text-muted-foreground">
+                                  • {document.file_size || document.size}
+                                </span>
+                              ) : null}
+                            </div>
                           </div>
                         </div>
+                        <div className="flex-shrink-0 ml-4">
+                          <PDFViewer document={document} />
+                        </div>
                       </div>
-                      <PDFViewer document={document} />
                     </div>
                   </AnimatedSection>
                 ))}

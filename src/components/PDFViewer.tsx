@@ -8,14 +8,19 @@ import { API_URLS } from '@/lib/apiConfig';
 interface DocumentViewerProps {
   document: {
     name: string;                    // Display name (user-friendly)
+    description?: string;            // Document description/caption
     filename?: string;               // Actual filename for URL generation
     document?: {
       url?: string;
       file?: string;
       id?: number;
+      title?: string;
+      filename?: string;
     };
     file_type?: string;
     file_size?: string;
+    type?: string;                   // Alternative file type field
+    size?: string;                   // Alternative file size field
   };
   className?: string;
 }
@@ -94,7 +99,7 @@ const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) 
     if (extension) return extension;
     
     // Fallback to fileType if no extension in filename
-    return fileType?.toLowerCase() || 'pdf';
+    return fileType?.toLowerCase() || 'file';
   };
 
   // Get the document URL directly from Wagtail
@@ -113,6 +118,20 @@ const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) 
       const file = document.document.file;
       console.log('📁 Using document file path:', file);
       return file;
+    }
+    
+    // Check if document has a filename property
+    if (document.document?.filename) {
+      const filename = document.document.filename;
+      console.log('📁 Using document filename:', filename);
+      return filename;
+    }
+    
+    // Check if document has a title that might be a filename
+    if (document.document?.title) {
+      const title = document.document.title;
+      console.log('📁 Using document title as filename:', title);
+      return title;
     }
     
     console.log('❌ No document URL found');
@@ -171,7 +190,8 @@ const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) 
         
         // Get the filename from the URL or use the document name
         const urlFilename = documentUrl.split('/').pop() || document.name;
-        const fileExtension = getFileExtension(urlFilename, document.file_type);
+        const fileType = document.file_type || document.type || document.document?.title;
+        const fileExtension = getFileExtension(urlFilename, fileType);
         const downloadFilename = urlFilename.includes('.') ? urlFilename : `${urlFilename}.${fileExtension}`;
         
         // Use window.document to avoid conflict with the document prop
@@ -193,8 +213,10 @@ const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) 
   };
 
   // Get the appropriate icon for this file type
-  const FileIcon = getFileIcon(document.filename || document.name, document.file_type);
-  const fileExtension = getFileExtension(document.filename || document.name, document.file_type);
+  const filename = document.document?.filename || document.filename || document.name;
+  const fileType = document.file_type || document.type || document.document?.title;
+  const FileIcon = getFileIcon(filename, fileType);
+  const fileExtension = getFileExtension(filename, fileType);
   const isPDF = fileExtension === 'pdf';
 
   return (
