@@ -132,13 +132,23 @@ const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) 
           documentUrl = `${baseUrl}${documentUrl}`;
         }
         console.log('Opening document URL:', documentUrl);
+        console.log('Document name from CMS:', document.name);
+        console.log('Document structure:', document);
         window.open(documentUrl, '_blank', 'noopener,noreferrer');
         setDocumentExists(true);
       } else {
         console.log('No document URL found, trying fallback...');
-        // Fallback to the original openPDF function
-        await openPDF(document);
-        setDocumentExists(true);
+        // Try to construct URL from document name with proper case preservation
+        const fallbackUrl = await findWorkingMediaUrl(document.name);
+        if (fallbackUrl) {
+          console.log('Using fallback URL:', fallbackUrl);
+          window.open(fallbackUrl, '_blank', 'noopener,noreferrer');
+          setDocumentExists(true);
+        } else {
+          // Final fallback to the original openPDF function
+          await openPDF(document);
+          setDocumentExists(true);
+        }
       }
     } catch (error) {
       console.error('Error opening document:', error);
@@ -173,7 +183,7 @@ const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) 
         }
       }
       
-      // If still no URL, try fallback
+      // If still no URL, try fallback with case preservation
       if (!documentUrl) {
         documentUrl = await findWorkingMediaUrl(document.name);
       }

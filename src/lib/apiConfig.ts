@@ -48,14 +48,13 @@ export const getApiUrl = (endpoint: string): string => {
  * @returns Full URL for the media file
  */
 export const getMediaUrl = (filename: string, path: string = API_CONFIG.RULES_PATH): string => {
-  // Clean filename
+  // Preserve original filename case and only clean spaces and special characters
   const cleanFilename = filename
-    .toLowerCase()
     .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-.]/g, '');
+    .replace(/[^a-zA-Z0-9-.]/g, '');
   
-  // Ensure .pdf extension
-  const finalFilename = cleanFilename.endsWith('.pdf') ? cleanFilename : `${cleanFilename}.pdf`;
+  // Keep original extension if it exists
+  const finalFilename = cleanFilename.includes('.') ? cleanFilename : `${cleanFilename}.pdf`;
   
   return `${API_CONFIG.BASE_URL}${path}${finalFilename}`;
 };
@@ -66,12 +65,13 @@ export const getMediaUrl = (filename: string, path: string = API_CONFIG.RULES_PA
  * @returns Array of fallback URLs
  */
 export const getFallbackUrls = (filename: string): string[] => {
+  // Preserve original filename case and only clean spaces and special characters
   const cleanFilename = filename
-    .toLowerCase()
     .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-.]/g, '');
+    .replace(/[^a-zA-Z0-9-.]/g, '');
   
-  const finalFilename = cleanFilename.endsWith('.pdf') ? cleanFilename : `${cleanFilename}.pdf`;
+  // Keep original extension if it exists
+  const finalFilename = cleanFilename.includes('.') ? cleanFilename : `${cleanFilename}.pdf`;
   
   return API_CONFIG.FALLBACK_URLS.map(url => `${url}${finalFilename}`);
 };
@@ -83,18 +83,25 @@ export const getFallbackUrls = (filename: string): string[] => {
  */
 export const findWorkingMediaUrl = async (filename: string): Promise<string | null> => {
   const urls = getFallbackUrls(filename);
+  console.log('Trying fallback URLs for filename:', filename);
+  console.log('Generated URLs:', urls);
   
   for (const url of urls) {
     try {
+      console.log('Checking URL:', url);
       const response = await fetch(url, { method: 'HEAD' });
       if (response.ok) {
+        console.log('Found working URL:', url);
         return url;
+      } else {
+        console.log(`URL not found (${response.status}):`, url);
       }
     } catch (error) {
       console.warn(`Failed to check URL: ${url}`, error);
     }
   }
   
+  console.log('No working URL found for:', filename);
   return null;
 };
 
