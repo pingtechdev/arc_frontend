@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Eye, Download, ExternalLink, AlertCircle } from 'lucide-react';
+import { Eye, Download, ExternalLink, AlertCircle, FileText, File, FileImage, FileVideo, FileAudio, FileArchive, FileCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { openPDF, checkPDFExists, isPDFFile, getWagtailDocumentUrl } from '@/lib/pdfViewer';
 import { findWorkingMediaUrl } from '@/lib/mediaConfig';
 import { API_URLS } from '@/lib/apiConfig';
 
-interface PDFViewerProps {
+interface DocumentViewerProps {
   document: {
     name: string;
     document?: {
@@ -19,29 +19,104 @@ interface PDFViewerProps {
   className?: string;
 }
 
-const PDFViewer: React.FC<PDFViewerProps> = ({ document, className = '' }) => {
+const PDFViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) => {
   const [isChecking, setIsChecking] = useState(false);
-  const [pdfExists, setPdfExists] = useState<boolean | null>(null);
+  const [documentExists, setDocumentExists] = useState<boolean | null>(null);
 
-  const handleViewPDF = async () => {
+  // Get appropriate icon for file type
+  const getFileIcon = (filename: string, fileType?: string) => {
+    const extension = filename.split('.').pop()?.toLowerCase() || fileType?.toLowerCase();
+    
+    switch (extension) {
+      case 'pdf':
+        return FileText;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'bmp':
+      case 'svg':
+      case 'webp':
+        return FileImage;
+      case 'mp4':
+      case 'avi':
+      case 'mov':
+      case 'wmv':
+      case 'flv':
+      case 'webm':
+        return FileVideo;
+      case 'mp3':
+      case 'wav':
+      case 'flac':
+      case 'aac':
+      case 'ogg':
+        return FileAudio;
+      case 'zip':
+      case 'rar':
+      case '7z':
+      case 'tar':
+      case 'gz':
+        return FileArchive;
+      case 'js':
+      case 'ts':
+      case 'jsx':
+      case 'tsx':
+      case 'html':
+      case 'css':
+      case 'scss':
+      case 'sass':
+      case 'json':
+      case 'xml':
+      case 'yaml':
+      case 'yml':
+        return FileCode;
+      case 'doc':
+      case 'docx':
+      case 'txt':
+      case 'rtf':
+        return FileText;
+      case 'xls':
+      case 'xlsx':
+      case 'csv':
+        return FileText;
+      case 'ppt':
+      case 'pptx':
+        return FileText;
+      default:
+        return File;
+    }
+  };
+
+  // Get file extension for download
+  const getFileExtension = (filename: string, fileType?: string) => {
+    const extension = filename.split('.').pop()?.toLowerCase();
+    if (extension) return extension;
+    
+    // Fallback to fileType if no extension in filename
+    return fileType?.toLowerCase() || 'pdf';
+  };
+
+  const handleViewDocument = async () => {
     setIsChecking(true);
     
     try {
+      console.log('Document structure:', document);
+      
       // First try to get the document URL from the CMS structure
-      let pdfUrl = null;
+      let documentUrl = null;
       
       // Check if we have a document object with URL
       if (document.document?.url) {
-        pdfUrl = document.document.url;
+        documentUrl = document.document.url;
       } else if (document.document?.file) {
-        pdfUrl = document.document.file;
+        documentUrl = document.document.file;
       } else if (document.document?.id) {
         // Try to fetch from Wagtail API
         try {
           const response = await fetch(`${API_URLS.DOCUMENTS}${document.document.id}/`);
           if (response.ok) {
             const data = await response.json();
-            pdfUrl = data.url;
+            documentUrl = data.url;
           }
         } catch (apiError) {
           console.warn('Failed to fetch document from API:', apiError);
@@ -49,39 +124,49 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ document, className = '' }) => {
       }
       
       // If we have a URL, open it
-      if (pdfUrl) {
-        window.open(pdfUrl, '_blank', 'noopener,noreferrer');
-        setPdfExists(true);
+      if (documentUrl) {
+        // Ensure the URL is absolute
+        if (documentUrl.startsWith('/')) {
+          // Get the base URL from API_URLS.DOCUMENTS
+          const baseUrl = API_URLS.DOCUMENTS.replace('/api/v2/documents/', '');
+          documentUrl = `${baseUrl}${documentUrl}`;
+        }
+        console.log('Opening document URL:', documentUrl);
+        window.open(documentUrl, '_blank', 'noopener,noreferrer');
+        setDocumentExists(true);
       } else {
+        console.log('No document URL found, trying fallback...');
         // Fallback to the original openPDF function
         await openPDF(document);
-        setPdfExists(true);
+        setDocumentExists(true);
       }
     } catch (error) {
-      console.error('Error opening PDF:', error);
-      setPdfExists(false);
-      alert('PDF not found. Please check if the document is properly uploaded in the CMS.');
+      console.error('Error opening document:', error);
+      setDocumentExists(false);
+      alert('Document not found. Please check if the file is properly uploaded in the CMS.');
     } finally {
       setIsChecking(false);
     }
   };
 
-  const handleDownloadPDF = async () => {
+  const handleDownloadDocument = async () => {
     try {
-      let pdfUrl = null;
+      console.log('Document structure for download:', document);
+      
+      let documentUrl = null;
       
       // Check if we have a document object with URL
       if (document.document?.url) {
-        pdfUrl = document.document.url;
+        documentUrl = document.document.url;
       } else if (document.document?.file) {
-        pdfUrl = document.document.file;
+        documentUrl = document.document.file;
       } else if (document.document?.id) {
         // Try to fetch from Wagtail API
         try {
           const response = await fetch(`${API_URLS.DOCUMENTS}${document.document.id}/`);
           if (response.ok) {
             const data = await response.json();
-            pdfUrl = data.url;
+            documentUrl = data.url;
           }
         } catch (apiError) {
           console.warn('Failed to fetch document from API:', apiError);
@@ -89,35 +174,55 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ document, className = '' }) => {
       }
       
       // If still no URL, try fallback
-      if (!pdfUrl) {
-        pdfUrl = await findWorkingMediaUrl(document.name);
+      if (!documentUrl) {
+        documentUrl = await findWorkingMediaUrl(document.name);
       }
       
-      if (pdfUrl) {
-        const link = document.createElement('a');
-        link.href = pdfUrl;
-        link.download = `${document.name}.pdf`;
+      if (documentUrl) {
+        // Ensure the URL is absolute
+        if (documentUrl.startsWith('/')) {
+          // Get the base URL from API_URLS.DOCUMENTS
+          const baseUrl = API_URLS.DOCUMENTS.replace('/api/v2/documents/', '');
+          documentUrl = `${baseUrl}${documentUrl}`;
+        }
+        
+        console.log('Downloading document URL:', documentUrl);
+        
+        // Get the proper file extension
+        const fileExtension = getFileExtension(document.name, document.file_type);
+        const downloadFilename = document.name.includes('.') ? document.name : `${document.name}.${fileExtension}`;
+        
+        // Use window.document to avoid conflict with the document prop
+        const link = window.document.createElement('a');
+        link.href = documentUrl;
+        link.download = downloadFilename;
         link.target = '_blank';
-        document.body.appendChild(link);
+        window.document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
+        window.document.body.removeChild(link);
       } else {
-        alert('PDF file not found for download. Please check if the document is properly uploaded in the CMS.');
+        console.log('No document URL found for download');
+        alert('Document not found for download. Please check if the file is properly uploaded in the CMS.');
       }
     } catch (error) {
-      console.error('Error downloading PDF:', error);
-      alert('Error downloading PDF file.');
+      console.error('Error downloading document:', error);
+      alert('Error downloading document file.');
     }
   };
+
+  // Get the appropriate icon for this file type
+  const FileIcon = getFileIcon(document.name, document.file_type);
+  const fileExtension = getFileExtension(document.name, document.file_type);
+  const isPDF = fileExtension === 'pdf';
 
   return (
     <div className={`flex items-center space-x-2 ${className}`}>
       <Button 
         variant="ghost" 
         size="sm"
-        onClick={handleViewPDF}
+        onClick={handleViewDocument}
         disabled={isChecking}
-        title="View PDF - Opens in new tab"
+        title={`View ${fileExtension.toUpperCase()} - Opens in new tab`}
         className="hover:bg-red-50 hover:text-red-600 transition-colors"
       >
         {isChecking ? (
@@ -130,15 +235,20 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ document, className = '' }) => {
       <Button 
         variant="ghost" 
         size="sm"
-        onClick={handleDownloadPDF}
-        title="Download PDF"
+        onClick={handleDownloadDocument}
+        title={`Download ${fileExtension.toUpperCase()}`}
         className="hover:bg-blue-50 hover:text-blue-600 transition-colors"
       >
         <Download className="h-4 w-4" />
       </Button>
       
-      {pdfExists === false && (
-        <div className="flex items-center text-yellow-600" title="PDF file not found">
+      {/* File type indicator */}
+      <div className="flex items-center text-muted-foreground" title={`${fileExtension.toUpperCase()} file`}>
+        <FileIcon className="h-4 w-4" />
+      </div>
+      
+      {documentExists === false && (
+        <div className="flex items-center text-yellow-600" title="Document file not found">
           <AlertCircle className="h-4 w-4" />
         </div>
       )}
